@@ -1,9 +1,27 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
-import { getLatestMonth, getAvailableTiers, getUsageStats, getMonthlyUsageForPokemon, getAvailableMonths } from '@/lib/smogon'
+import dynamic from 'next/dynamic'
+import { getLatestMonth, getAvailableTiers, getUsageStats, getAvailableMonths } from '@/lib/smogon'
 import ErrorBoundary from '@/components/ErrorBoundary'
-import SearchTrendClient from './SearchTrendClient'
 import TierSelector from '@/components/TierSelector'
+
+const SearchTrendClient = dynamic(() => import('./SearchTrendClient'), {
+  ssr: false,
+  loading: () => (
+    <div className="space-y-4">
+      <input
+        type="text"
+        placeholder="Search Pokemon (e.g. Garchomp)..."
+        disabled
+        className="w-full rounded-lg bg-white/10 border border-white/15 px-4 py-3 text-slate-100 placeholder-slate-500 text-sm min-h-[44px] opacity-60 cursor-not-allowed"
+        aria-label="Search Pokemon for trend chart"
+      />
+      <div className="rounded-xl bg-[#1a1a24] border border-white/6 p-6">
+        <div className="h-80 animate-pulse bg-white/5 rounded-lg" />
+      </div>
+    </div>
+  ),
+})
 
 export const revalidate = 86400
 
@@ -27,31 +45,27 @@ interface TrendsPageProps {
   searchParams: Promise<{ tier?: string }>
 }
 
-const CHART_COLORS = [
-  '#6366f1', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6',
-  '#ec4899', '#14b8a6', '#f97316', '#3b82f6', '#84cc16',
-]
-
 async function TrendsContent({ tier }: { tier: string }) {
-  const allMonths = await getAvailableMonths()
-  const last6Months = allMonths.slice(0, 6).reverse()
-  const latestMonth = allMonths[0] ?? await getLatestMonth()
-  const latestStats = await getUsageStats(latestMonth, tier).catch(() => [])
-  const prevStats = await getUsageStats(allMonths[1] ?? latestMonth, tier).catch(() => [])
+  // Parallel: fetch months list + latest month probe simultaneously
+  const [allMonths, latestMonthFallback] = await Promise.all([
+    getAvailableMonths(),
+    getLatestMonth(),
+  ])
 
-  const top10 = latestStats.slice(0, 10)
-  const top10Names = top10.map((s) => s.name)
+  const last6Months = allMonths.slice(0, 6).reverse()
+  const latestMonth = allMonths[0] ?? latestMonthFallback
+  const prevMonth = allMonths[1] ?? latestMonth
+
+  // Parallel: fetch both months' stats simultaneously
+  const [latestStats, prevStats] = await Promise.all([
+    getUsageStats(latestMonth, tier).catch(() => []),
+    getUsageStats(prevMonth, tier).catch(() => []),
+  ])
+
+  const top10Names = latestStats.slice(0, 10).map((s) => s.name)
   const allNames = latestStats.map((s) => s.name)
 
-  // Fetch trend data for top 10 (default view)
-  const defaultSeries = await Promise.all(
-    top10Names.map(async (name, i) => {
-      const data = await getMonthlyUsageForPokemon(name, tier, last6Months)
-      return { name, color: CHART_COLORS[i % CHART_COLORS.length], data }
-    })
-  )
-
-  // Rising / Falling
+  // Rising / Falling (server-computed, no heavy trend fetch needed)
   const changes = latestStats.slice(0, 50).map((s) => {
     const prev = prevStats.find((p) => p.name === s.name)
     return { name: s.name, change: s.usagePercent - (prev?.usagePercent ?? 0) }
@@ -61,31 +75,14 @@ async function TrendsContent({ tier }: { tier: string }) {
 
   return (
     <div className="space-y-8">
-      {/* Search + Chart — client interactive */}
+      {/* Search + Chart — rendered client-side only to avoid server timeout */}
       <ErrorBoundary>
-        <Suspense fallback={
-          <div className="space-y-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search Pokemon (e.g. Garchomp)..."
-                disabled
-                className="w-full rounded-lg bg-white/10 border border-white/15 px-4 py-3 text-slate-100 placeholder-slate-500 text-sm min-h-[44px] opacity-60 cursor-not-allowed"
-                aria-label="Search Pokemon for trend chart"
-              />
-            </div>
-            <div className="rounded-xl bg-[#1a1a24] border border-white/6 p-6">
-              <div className="h-80 animate-pulse bg-white/5 rounded-lg" />
-            </div>
-          </div>
-        }>
-          <SearchTrendClient
-            defaultSeries={defaultSeries}
-            allPokemonNames={allNames}
-            tier={tier}
-            months={last6Months}
-          />
-        </Suspense>
+        <SearchTrendClient
+          initialNames={top10Names}
+          allPokemonNames={allNames}
+          tier={tier}
+          months={last6Months}
+        />
       </ErrorBoundary>
 
       <div className="grid sm:grid-cols-2 gap-6">

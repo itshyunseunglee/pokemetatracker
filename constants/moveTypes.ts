@@ -71,7 +71,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Psychic': 'psychic', 'Psyshock': 'psychic', 'Psystrike': 'psychic', 'Zen Headbutt': 'psychic',
   'Future Sight': 'psychic', 'Trick Room': 'psychic', 'Trick': 'psychic', 'Healing Wish': 'psychic',
   'Lunar Dance': 'psychic', 'Teleport': 'psychic', 'Reflect': 'psychic', 'Light Screen': 'psychic',
-  'Expanding Force': 'psychic', 'Lumina Crash': 'psychic', 'Twin Beam': 'psychic', 'Armor Cannon': 'fire',
+  'Expanding Force': 'psychic', 'Lumina Crash': 'psychic', 'Twin Beam': 'psychic', 'Psychic Noise': 'psychic', 'Armor Cannon': 'fire',
 
   // Bug
   'Bug Buzz': 'bug', 'U-turn': 'bug', 'Leech Life': 'bug', 'Pin Missile': 'bug',

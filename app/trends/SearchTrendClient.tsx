@@ -15,7 +15,7 @@ interface Series {
 }
 
 interface Props {
-  defaultSeries: Series[]
+  initialNames: string[]
   allPokemonNames: string[]
   tier: string
   months: string[]
@@ -26,19 +26,41 @@ const CHART_COLORS = [
   '#ec4899', '#14b8a6', '#f97316', '#3b82f6', '#84cc16',
 ]
 
-export default function SearchTrendClient({ defaultSeries, allPokemonNames, tier, months }: Props): React.JSX.Element {
+export default function SearchTrendClient({ initialNames, allPokemonNames, tier, months }: Props): React.JSX.Element {
   const [query, setQuery] = useState('')
   const [matchedNames, setMatchedNames] = useState<string[]>([])
-  const [chartSeries, setChartSeries] = useState<Series[]>(defaultSeries)
-  const [loading, setLoading] = useState(false)
+  const [initialSeries, setInitialSeries] = useState<Series[]>([])
+  const [chartSeries, setChartSeries] = useState<Series[]>([])
+  const [loading, setLoading] = useState(true)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const didFetchRef = useRef(false)
+
+  // Fetch initial chart data client-side to avoid server timeout
+  useEffect(() => {
+    if (didFetchRef.current || initialNames.length === 0 || months.length === 0) {
+      setLoading(false)
+      return
+    }
+    didFetchRef.current = true
+    fetch(
+      `/api/trends?names=${encodeURIComponent(initialNames.slice(0, 10).join(','))}&tier=${encodeURIComponent(tier)}&months=${encodeURIComponent(months.join(','))}`
+    )
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: { name: string; data: { month: string; usagePercent: number }[] }[]) => {
+        const series = data.map((d, i) => ({ ...d, color: CHART_COLORS[i % CHART_COLORS.length] }))
+        setInitialSeries(series)
+        setChartSeries(series)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
 
     const trimmed = query.trim()
     if (!trimmed) {
-      setChartSeries(defaultSeries)
+      setChartSeries(initialSeries)
       setMatchedNames([])
       return
     }
@@ -55,7 +77,6 @@ export default function SearchTrendClient({ defaultSeries, allPokemonNames, tier
 
       setLoading(true)
       try {
-        // Fetch trend data via API route to avoid client-side Smogon calls
         const res = await fetch(
           `/api/trends?names=${encodeURIComponent(matches.join(','))}&tier=${encodeURIComponent(tier)}&months=${encodeURIComponent(months.join(','))}`
         )
@@ -64,9 +85,7 @@ export default function SearchTrendClient({ defaultSeries, allPokemonNames, tier
           setChartSeries(data.map((d, i) => ({ ...d, color: CHART_COLORS[i % CHART_COLORS.length] })))
         }
       } catch {
-        // On error, filter from defaultSeries
-        const filtered = defaultSeries.filter((s) => s.name.toLowerCase().includes(lower))
-        setChartSeries(filtered)
+        setChartSeries([])
       } finally {
         setLoading(false)
       }
@@ -75,11 +94,10 @@ export default function SearchTrendClient({ defaultSeries, allPokemonNames, tier
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [query, defaultSeries, allPokemonNames, tier, months])
+  }, [query, initialSeries, allPokemonNames, tier, months])
 
   return (
     <div className="space-y-4">
-      {/* Search input */}
       <div className="relative">
         <input
           type="text"
@@ -109,7 +127,6 @@ export default function SearchTrendClient({ defaultSeries, allPokemonNames, tier
         <p className="text-slate-500 text-xs">No Pokemon found matching &quot;{query}&quot;</p>
       )}
 
-      {/* Chart */}
       <div className="rounded-xl bg-[#1a1a24] border border-white/6 p-6">
         <h2 className="text-lg font-semibold text-white mb-4">
           {query ? 'Search Results' : 'Top 10 Usage Trends'} — Last 6 Months

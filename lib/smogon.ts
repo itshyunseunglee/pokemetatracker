@@ -47,6 +47,16 @@ export async function getLatestMonth(): Promise<string> {
   return candidate
 }
 
+function recentMonthsFallback(count: number): string[] {
+  const months: string[] = []
+  const now = new Date()
+  for (let i = 1; i <= count; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    months.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`)
+  }
+  return months
+}
+
 export async function getAvailableMonths(): Promise<string[]> {
   const cacheKey = 'smogon:available-months'
   const cached = getCached<string[]>(cacheKey)
@@ -55,17 +65,19 @@ export async function getAvailableMonths(): Promise<string[]> {
   try {
     const html = await smogonFetch(`${BASE_URL}/`)
     const months: string[] = []
-    const regex = /href="(\d{4}-\d{2})\/"/g
+    // Try both quoted and unquoted href patterns
+    const regex = /href=["']?(\d{4}-\d{2})\/["']?/g
     let match: RegExpExecArray | null
     while ((match = regex.exec(html)) !== null) {
       months.push(match[1])
     }
     months.sort((a, b) => b.localeCompare(a))
-    setCached(cacheKey, months, TTL_24H)
-    return months
+    const result = months.length > 0 ? months : recentMonthsFallback(12)
+    if (result.length > 0) setCached(cacheKey, result, TTL_24H)
+    return result
   } catch (err) {
     console.error('[smogon] getAvailableMonths failed:', err)
-    return []
+    return recentMonthsFallback(12)
   }
 }
 

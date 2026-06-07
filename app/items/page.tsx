@@ -119,7 +119,13 @@ async function ItemsContent({ tier }: { tier: string }) {
             <tr className="bg-white/5 text-left">
               <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Rank</th>
               <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Item</th>
-              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Aggregate Usage %</th>
+              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">
+                Aggregate Usage %
+                <span
+                  title="Weighted average across the top 50 Pokemon by usage. Represents how often this item appears on a typical team in this tier."
+                  className="ml-1 cursor-help text-slate-500 hover:text-slate-300"
+                >ⓘ</span>
+              </th>
             </tr>
           </thead>
           <tbody>
