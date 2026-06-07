@@ -32,6 +32,9 @@ export const PokemonRowClient = memo(function PokemonRowClient({
   const normalized = normalizeSmogonName(name)
   const artworkUrls = getPokemonImageUrls(name)
   const spriteUrls = getPokemonSpriteUrls(name)
+  if (rank <= 3) {
+    console.log('[PokemonRowClient] rank=%d name=%s normalized=%s sprite[0]=%s artwork[0]=%s', rank, name, normalized, spriteUrls[0], artworkUrls[0])
+  }
 
   if (view === 'card') {
     return (

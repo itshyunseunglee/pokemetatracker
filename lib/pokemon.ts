@@ -50,10 +50,13 @@ export function getPokemonImageUrls(name: string): string[] {
 // For table-row small sprites
 export function getPokemonSpriteUrls(name: string): string[] {
   const id = getPokemonId(name)
-  const showdownDex = getShowdownSpriteUrl(name)   // /sprites/dex/ — exists for all Pokemon incl. Gen 9
+  const showdownDex = getShowdownSpriteUrl(name)   // /sprites/dex/ — may 404 for some Gen 9 Pokemon
   const showdownPixel = getShowdownPixelUrl(name)   // /sprites/gen5/ — may be missing for Gen 9
   if (id) {
-    return [showdownDex, getPixelSpriteUrl(id), showdownPixel]
+    // PokeAPI pixel sprite first: always returns 200 for known IDs.
+    // This prevents a priority-image 404 from firing onError during React hydration,
+    // which was causing rank #1 (Great Tusk) to render broken on initial load.
+    return [getPixelSpriteUrl(id), showdownDex, showdownPixel]
   }
   return [showdownDex, showdownPixel]
 }
