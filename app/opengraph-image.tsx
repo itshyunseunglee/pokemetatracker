@@ -94,7 +94,6 @@ export default async function OGImage() {
               borderRadius: 999,
               padding: '9px 22px',
               marginBottom: 32,
-              width: 'fit-content',
             }}
           >
             <div
