@@ -1,31 +1,6 @@
 import { getLatestMonth, getUsageStats } from '@/lib/smogon'
-import { normalizeSmogonName } from '@/lib/pokemon'
+import { getPokemonImageUrls } from '@/lib/pokemon'
 import FloatingSprite from './FloatingSprite'
-
-function seededRng(seed: number): () => number {
-  let s = (seed ^ 0xdeadbeef) >>> 0
-  return () => {
-    s = Math.imul(s ^ (s >>> 16), 0x45d9f3b)
-    s = Math.imul(s ^ (s >>> 16), 0x45d9f3b)
-    s = (s ^ (s >>> 16)) >>> 0
-    return s / 0x100000000
-  }
-}
-
-function pickDailyPokemon(names: string[], count: number): string[] {
-  const today = new Date()
-  const seed =
-    today.getUTCFullYear() * 10000 +
-    (today.getUTCMonth() + 1) * 100 +
-    today.getUTCDate()
-  const rng = seededRng(seed)
-  const pool = [...names]
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1))
-    ;[pool[i], pool[j]] = [pool[j], pool[i]]
-  }
-  return pool.slice(0, count)
-}
 
 const LAYOUTS = [
   { right: 30,  top: 20,  size: 155, anim: 'pokemon-float-delay-2', opacity: 0.72, glowColor: 'rgba(99,102,241,0.35)' },
@@ -39,9 +14,9 @@ export default async function HeroFloatingPokemon() {
   try {
     const month = await getLatestMonth()
     const stats = await getUsageStats(month, 'gen9ou').catch(() => [])
-    if (stats.length < 10) return null
+    if (stats.length < 5) return null
 
-    const daily = stats.slice(0, 5).map((s) => s.name)
+    const top5 = stats.slice(0, 5).map((s) => s.name)
 
     return (
       <div
@@ -49,18 +24,12 @@ export default async function HeroFloatingPokemon() {
         className="pointer-events-none absolute top-0 right-0 hidden md:block select-none"
         style={{ width: 340, height: 400 }}
       >
-        {daily.map((name, i) => {
+        {top5.map((name, i) => {
           const l = LAYOUTS[i]
-          const sprite = normalizeSmogonName(name)
-          const urls = [
-            `https://play.pokemonshowdown.com/sprites/dex/${sprite}.png`,
-            `https://play.pokemonshowdown.com/sprites/gen5/${sprite}.png`,
-            `https://play.pokemonshowdown.com/sprites/gen5ani/${sprite}.gif`,
-          ]
           return (
             <FloatingSprite
               key={name}
-              urls={urls}
+              urls={getPokemonImageUrls(name)}
               size={l.size}
               right={l.right}
               top={l.top}

@@ -350,19 +350,19 @@ export async function getMonthlyUsageForPokemon(
   tier: string,
   months: string[]
 ): Promise<MonthlyUsage[]> {
-  const results: MonthlyUsage[] = []
-  for (const month of months) {
-    try {
-      const text = await getRawUsageText(month, tier)
-      const stats = parseUsageStats(text)
-      const entry = stats.find((s) => s.name.toLowerCase() === pokemon.toLowerCase())
-      if (entry != null) results.push({ month, usagePercent: entry.usagePercent })
-      // months with no data are omitted → TrendChart renders a gap (null) instead of 0%
-    } catch {
-      // skip months where the file doesn't exist
-    }
-  }
-  return results
+  const settled = await Promise.all(
+    months.map(async (month): Promise<MonthlyUsage | null> => {
+      try {
+        const text = await getRawUsageText(month, tier)
+        const stats = parseUsageStats(text)
+        const entry = stats.find((s) => s.name.toLowerCase() === pokemon.toLowerCase())
+        return entry != null ? { month, usagePercent: entry.usagePercent } : null
+      } catch {
+        return null
+      }
+    })
+  )
+  return settled.filter((r): r is MonthlyUsage => r !== null)
 }
 
 export async function getUsageStats(month: string, tier: string): Promise<UsageStat[]> {

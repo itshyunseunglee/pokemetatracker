@@ -293,15 +293,12 @@ async function PokemonDetail({ name }: { name: string }) {
 
       {last6.length > 0 && (
         <ErrorBoundary>
-          <div className="rounded-xl bg-[#1a1a24] border border-white/6 p-6">
-            <h2 className="text-lg font-semibold text-white mb-4">6-Month Usage Trend</h2>
-            <PokemonTrendSection
-              pokemonName={smogonName}
-              displayName={displayName}
-              tier={mainTier}
-              months={last6}
-            />
-          </div>
+          <PokemonTrendSection
+            pokemonName={smogonName}
+            displayName={displayName}
+            tier={mainTier}
+            months={last6}
+          />
         </ErrorBoundary>
       )}
     </div>

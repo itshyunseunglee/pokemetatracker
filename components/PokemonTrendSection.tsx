@@ -38,15 +38,23 @@ export default function PokemonTrendSection({ pokemonName, displayName, tier, mo
   }, [pokemonName, tier, months]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
-    return <div className="h-64 animate-pulse bg-white/5 rounded-lg" />
+    return (
+      <div className="rounded-xl bg-[#1a1a24] border border-white/6 p-6">
+        <h2 className="text-lg font-semibold text-white mb-4">6-Month Usage Trend</h2>
+        <div className="h-64 animate-pulse bg-white/5 rounded-lg" />
+      </div>
+    )
   }
 
   if (!data.length) return null
 
   return (
-    <TrendChart
-      series={[{ name: displayName, color: '#6366f1', data }]}
-      height={256}
-    />
+    <div className="rounded-xl bg-[#1a1a24] border border-white/6 p-6">
+      <h2 className="text-lg font-semibold text-white mb-4">6-Month Usage Trend</h2>
+      <TrendChart
+        series={[{ name: displayName, color: '#6366f1', data }]}
+        height={256}
+      />
+    </div>
   )
 }
