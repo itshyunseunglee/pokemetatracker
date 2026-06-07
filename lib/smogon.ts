@@ -303,10 +303,10 @@ export function parseMovesetData(text: string, pokemonName: string): MovesetData
         const pct = parseFloat(percentMatch[2])
         if (name && !isNaN(pct)) result.teammates.push({ name, percent: pct })
       } else if (currentSection === 'counters') {
-        // Counters span two lines: "Name score (KO±err)" then "(XX% KOed / YY% switched out)"
-        if (content.startsWith('(')) {
-          const koMatch = content.match(/([\d.]+)%\s*KOed\s*\/\s*([\d.]+)%\s*switched/)
-          if (koMatch && pendingCounterName) {
+        // Counters: name line "Name    score (KO±err)", then KO% line "(XX% KOed / YY% switched)"
+        const koMatch = content.match(/([\d.]+)%\s*KOed\s*\/\s*([\d.]+)%\s*switched/)
+        if (koMatch) {
+          if (pendingCounterName) {
             result.counters.push({
               name: pendingCounterName,
               koPercent: parseFloat(koMatch[1]),
@@ -314,9 +314,9 @@ export function parseMovesetData(text: string, pokemonName: string): MovesetData
             })
           }
           pendingCounterName = ''
-        } else {
-          // Extract Pokemon name before the score number
-          const nameMatch = content.match(/^([A-Za-z][A-Za-z0-9\s\-'.]+?)(?:\s+[\d.]+\s*[\(\d]|$)/)
+        } else if (/^[A-Za-z]/.test(content)) {
+          // Name comes before 2+ spaces then the numeric score
+          const nameMatch = content.match(/^([A-Za-z][A-Za-z0-9\s\-'.]+?)\s{2,}\d/)
           if (nameMatch) pendingCounterName = nameMatch[1].trim()
         }
       }

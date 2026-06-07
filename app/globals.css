@@ -63,7 +63,7 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-slide 4s linear infinite;
+  animation: gradient-slide 8s linear infinite;
 }
 
 @keyframes gradient-slide {
