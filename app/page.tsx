@@ -7,7 +7,6 @@ import pokemonDataRaw from '@/lib/pokemon-data.json'
 import PokemonCard from '@/components/PokemonCard'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { SkeletonCardGrid } from '@/components/SkeletonCard'
-import TierSelector from '@/components/TierSelector'
 import HeroFloatingPokemon from '@/components/HeroFloatingPokemon'
 import MonthlyHighlights from '@/components/MonthlyHighlights'
 
@@ -17,22 +16,18 @@ export const metadata: Metadata = {
   title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',
   description:
     'Track Pokemon Showdown competitive meta trends, usage stats, movesets, and tier rankings updated monthly from Smogon data.',
-  alternates: { canonical: 'https://pokemetatracker.vercel.app' },
+  alternates: { canonical: 'https://pokemetatracker-psi.vercel.app' },
   openGraph: {
     title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',
     description:
       'Track Pokemon Showdown competitive meta trends, usage stats, movesets, and tier rankings updated monthly from Smogon data.',
-    url: 'https://pokemetatracker.vercel.app',
-    images: [{ url: 'https://pokemetatracker.vercel.app/opengraph-image', width: 1200, height: 630 }],
+    url: 'https://pokemetatracker-psi.vercel.app',
+    images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    images: ['https://pokemetatracker.vercel.app/opengraph-image'],
+    images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
   },
-}
-
-interface HomePageProps {
-  searchParams: Promise<{ tier?: string }>
 }
 
 function formatMonthDisplay(yyyyMm: string): string {
@@ -55,7 +50,7 @@ async function HeroStats() {
 
   const gens = new Set<number>()
   for (const t of tiers) {
-    const g = parseInt(t.match(/^gen(\d+)/)?.[1] ?? '0', 10)
+    const g = parseInt(t.match(/^gen(\d)/)?.[1] ?? '0', 10)
     if (g > 0) gens.add(g)
   }
   const genArr = Array.from(gens)
@@ -92,10 +87,9 @@ async function HeroBadge() {
   )
 }
 
-async function HomeContent({ selectedTier }: { selectedTier: string }) {
+async function HomeContent() {
   const month = await getLatestMonth()
-  const tiers = await getAvailableTiers(month)
-  const tier = selectedTier && tiers.includes(selectedTier) ? selectedTier : tiers[0] ?? 'gen9ou'
+  const tier = 'gen9ou'
 
   const [currentStats, prevMonthStats] = await Promise.all([
     getUsageStats(month, tier).catch(() => []),
@@ -121,8 +115,6 @@ async function HomeContent({ selectedTier }: { selectedTier: string }) {
 
   return (
     <>
-      <TierSelector tiers={tiers} selectedTier={tier} basePath="/" />
-
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {top10.map((pokemon) => (
           <PokemonCard
@@ -137,7 +129,7 @@ async function HomeContent({ selectedTier }: { selectedTier: string }) {
 
       <div className="mt-6 text-center">
         <Link
-          href={`/tier/${tier}`}
+          href="/tier/gen9ou"
           className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px]"
         >
           View Full {formatTierName(tier)} Rankings →
@@ -147,15 +139,12 @@ async function HomeContent({ selectedTier }: { selectedTier: string }) {
   )
 }
 
-export default async function HomePage({ searchParams }: HomePageProps) {
-  const params = await searchParams
-  const selectedTier = params.tier ?? ''
-
+export default async function HomePage() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'PokeMetaTracker',
-    url: 'https://pokemetatracker.vercel.app',
+    url: 'https://pokemetatracker-psi.vercel.app',
     description: 'Track Pokemon Showdown competitive meta trends and usage statistics.',
   }
 
@@ -267,7 +256,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         </Suspense>
         <ErrorBoundary>
           <Suspense fallback={<SkeletonCardGrid count={10} />}>
-            <HomeContent selectedTier={selectedTier} />
+            <HomeContent />
           </Suspense>
         </ErrorBoundary>
       </section>

@@ -9,7 +9,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Substitute': 'normal', 'Swords Dance': 'normal', 'Nasty Plot': 'normal', 'Calm Mind': 'normal',
   'Amnesia': 'normal', 'Haze': 'normal', 'Baton Pass': 'normal', 'Encore': 'normal',
   'Taunt': 'normal', 'Toxic': 'poison', 'Whirlwind': 'normal', 'Roar': 'normal',
-  'Entrainment': 'normal', 'Minimize': 'normal',
+  'Entrainment': 'normal', 'Minimize': 'normal', 'Rapid Spin': 'normal',
 
   // Fire
   'Flamethrower': 'fire', 'Fire Blast': 'fire', 'Overheat': 'fire', 'Heat Wave': 'fire',
@@ -36,7 +36,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Seed Flare': 'grass', 'Spore': 'grass', 'Sleep Powder': 'grass', 'Leech Seed': 'grass',
   'Synthesis': 'grass', 'Wood Hammer': 'grass', 'Leaf Blade': 'grass', 'Bullet Seed': 'grass',
   'Solar Beam': 'grass', 'Solar Blade': 'grass', 'Grassy Glide': 'grass', 'Pollen Puff': 'grass',
-  'Petal Dance': 'grass', 'Petal Blizzard': 'grass',
+  'Petal Dance': 'grass', 'Petal Blizzard': 'grass', 'Ivy Cudgel': 'grass',
 
   // Ice
   'Blizzard': 'ice', 'Ice Beam': 'ice', 'Freeze-Dry': 'ice', 'Icicle Crash': 'ice',
@@ -49,7 +49,8 @@ export const MOVE_TYPES: Record<string, string> = {
   'Jump Kick': 'fighting', 'Circle Throw': 'fighting', 'Seismic Toss': 'fighting',
   'Low Kick': 'fighting', 'Low Sweep': 'fighting', 'Cross Chop': 'fighting',
   'Sacred Sword': 'fighting', 'Secret Sword': 'fighting', 'Vacuum Wave': 'fighting',
-  'Bulk Up': 'fighting', 'Coaching': 'fighting',
+  'Bulk Up': 'fighting', 'Coaching': 'fighting', 'Body Press': 'fighting',
+  'Kowtow Cleave': 'dark',
 
   // Poison
   'Sludge Bomb': 'poison', 'Sludge Wave': 'poison', 'Poison Jab': 'poison', 'Gunk Shot': 'poison',
@@ -58,7 +59,7 @@ export const MOVE_TYPES: Record<string, string> = {
   // Ground
   'Earthquake': 'ground', 'Earth Power': 'ground', 'Precipice Blades': 'ground',
   'High Horsepower': 'ground', 'Bulldoze': 'ground', 'Sand Attack': 'ground',
-  'Shore Up': 'ground', 'Spikes': 'ground',
+  'Shore Up': 'ground', 'Spikes': 'ground', 'Headlong Rush': 'ground',
 
   // Flying
   'Brave Bird': 'flying', 'Hurricane': 'flying', 'Acrobatics': 'flying', 'Roost': 'flying',
@@ -98,6 +99,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Iron Head': 'steel', 'Flash Cannon': 'steel', 'Meteor Mash': 'steel', 'Bullet Punch': 'steel',
   'Iron Defense': 'steel', 'Steel Beam': 'steel', 'Heavy Slam': 'steel', 'Smart Strike': 'steel',
   'Shift Gear': 'steel', 'Doom Desire': 'steel', 'Sunsteel Strike': 'steel', 'Tachyon Cutter': 'steel',
+  'Make It Rain': 'steel',
 
   // Fairy
   'Moonblast': 'fairy', 'Dazzling Gleam': 'fairy', 'Play Rough': 'fairy', 'Charm': 'fairy',

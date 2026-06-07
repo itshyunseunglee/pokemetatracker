@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 import { getLatestMonth, getAvailableTiers, getUsageStats } from '@/lib/smogon'
 import { normalizeSmogonName } from '@/lib/pokemon'
 
-const BASE_URL = 'https://pokemetatracker.vercel.app'
+const BASE_URL = 'https://pokemetatracker-psi.vercel.app'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [

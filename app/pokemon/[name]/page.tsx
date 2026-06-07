@@ -40,7 +40,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PokemonPageProps): Promise<Metadata> {
   const { name } = await params
   const displayName = name.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-  const url = `https://pokemetatracker.vercel.app/pokemon/${name}`
+  const url = `https://pokemetatracker-psi.vercel.app/pokemon/${name}`
   return {
     title: `${displayName} Usage Stats, Movesets & Counters | PokeMetaTracker`,
     description: `${displayName} usage rate, top movesets, best items, teammates, and counters in Pokemon Showdown competitive play.`,
@@ -49,11 +49,11 @@ export async function generateMetadata({ params }: PokemonPageProps): Promise<Me
       title: `${displayName} Usage Stats, Movesets & Counters | PokeMetaTracker`,
       description: `${displayName} usage rate, top movesets, best items, teammates, and counters in Pokemon Showdown competitive play.`,
       url,
-      images: [{ url: 'https://pokemetatracker.vercel.app/opengraph-image', width: 1200, height: 630 }],
+      images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
-      images: ['https://pokemetatracker.vercel.app/opengraph-image'],
+      images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
     },
   }
 }

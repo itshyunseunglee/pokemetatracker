@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Nav from '@/components/Nav'
 
-const SITE_URL = 'https://pokemetatracker.vercel.app'
-const OG_IMAGE = 'https://pokemetatracker.vercel.app/opengraph-image'
+const SITE_URL = 'https://pokemetatracker-psi.vercel.app'
+const OG_IMAGE = 'https://pokemetatracker-psi.vercel.app/opengraph-image'
 
 export const metadata: Metadata = {
   title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',

@@ -31,7 +31,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: TierPageProps): Promise<Metadata> {
   const { tier } = await params
   const displayName = formatTierName(tier)
-  const url = `https://pokemetatracker.vercel.app/tier/${tier}`
+  const url = `https://pokemetatracker-psi.vercel.app/tier/${tier}`
   return {
     title: `${displayName} Tier Pokemon Usage Rankings | PokeMetaTracker`,
     description: `Full ${displayName} tier usage rankings from Smogon competitive Pokemon Showdown statistics.`,
@@ -40,11 +40,11 @@ export async function generateMetadata({ params }: TierPageProps): Promise<Metad
       title: `${displayName} Tier Pokemon Usage Rankings | PokeMetaTracker`,
       description: `Full ${displayName} tier usage rankings from Smogon competitive Pokemon Showdown statistics.`,
       url,
-      images: [{ url: 'https://pokemetatracker.vercel.app/opengraph-image', width: 1200, height: 630 }],
+      images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
     },
     twitter: {
       card: 'summary_large_image',
-      images: ['https://pokemetatracker.vercel.app/opengraph-image'],
+      images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
     },
   }
 }
@@ -222,7 +222,7 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
     '@type': 'ItemList',
     name: `${displayName} Pokemon Usage Rankings`,
     description,
-    url: `https://pokemetatracker.vercel.app/tier/${tier}`,
+    url: `https://pokemetatracker-psi.vercel.app/tier/${tier}`,
   }
 
   return (

@@ -10,16 +10,16 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'Item Trends - Pokemon Showdown Usage | PokeMetaTracker',
   description: 'Top held item usage rankings in competitive Pokemon Showdown, filtered by tier.',
-  alternates: { canonical: 'https://pokemetatracker.vercel.app/items' },
+  alternates: { canonical: 'https://pokemetatracker-psi.vercel.app/items' },
   openGraph: {
     title: 'Item Trends - Pokemon Showdown Usage | PokeMetaTracker',
     description: 'Top held item usage rankings in competitive Pokemon Showdown, filtered by tier.',
-    url: 'https://pokemetatracker.vercel.app/items',
-    images: [{ url: 'https://pokemetatracker.vercel.app/opengraph-image', width: 1200, height: 630 }],
+    url: 'https://pokemetatracker-psi.vercel.app/items',
+    images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    images: ['https://pokemetatracker.vercel.app/opengraph-image'],
+    images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
   },
 }
 

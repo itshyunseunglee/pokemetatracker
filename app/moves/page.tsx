@@ -12,16 +12,16 @@ export const revalidate = 86400
 export const metadata: Metadata = {
   title: 'Move Trends - Pokemon Showdown Usage | PokeMetaTracker',
   description: 'Top move usage rankings in competitive Pokemon Showdown, filtered by tier.',
-  alternates: { canonical: 'https://pokemetatracker.vercel.app/moves' },
+  alternates: { canonical: 'https://pokemetatracker-psi.vercel.app/moves' },
   openGraph: {
     title: 'Move Trends - Pokemon Showdown Usage | PokeMetaTracker',
     description: 'Top move usage rankings in competitive Pokemon Showdown, filtered by tier.',
-    url: 'https://pokemetatracker.vercel.app/moves',
-    images: [{ url: 'https://pokemetatracker.vercel.app/opengraph-image', width: 1200, height: 630 }],
+    url: 'https://pokemetatracker-psi.vercel.app/moves',
+    images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    images: ['https://pokemetatracker.vercel.app/opengraph-image'],
+    images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
   },
 }
 
