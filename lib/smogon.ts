@@ -332,7 +332,7 @@ export function parseMovesetData(text: string, pokemonName: string): MovesetData
         } else if (/^[A-Za-z]/.test(content)) {
           // Counter line format: "Name   1.234 (kp ± err)" OR "Name   | 1.234 | (kp ± err)"
           // The pipe variant occurs when Smogon uses multi-column table formatting.
-          const nameMatch = content.match(/^([A-Za-z][A-Za-z0-9\s\-'.]+?)(\s{2,}|\s*\|)\s*[\d|]/)
+          const nameMatch = content.match(/^([A-Za-z][A-Za-z0-9\s\-'.]+?)(\s+|\s*\|)\s*[\d|]/)
           if (nameMatch) pendingCounterName = nameMatch[1].trim()
         }
       }

@@ -2,14 +2,14 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Nav from '@/components/Nav'
 
-const SITE_URL = 'https://pokemetatracker-psi.vercel.app'
-const OG_IMAGE = 'https://pokemetatracker-psi.vercel.app/opengraph-image'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemetatracker-psi.vercel.app'
+const OG_IMAGE = `${SITE_URL}/opengraph-image`
 
 export const metadata: Metadata = {
   title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',
   description:
     'Track Pokemon Showdown competitive meta trends, usage stats, movesets, and tier rankings updated monthly from Smogon data.',
-  metadataBase: new URL('https://pokemetatracker-psi.vercel.app'),
+  metadataBase: new URL(SITE_URL),
   alternates: { canonical: SITE_URL },
   openGraph: {
     title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',

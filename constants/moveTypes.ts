@@ -10,20 +10,21 @@ export const MOVE_TYPES: Record<string, string> = {
   'Amnesia': 'normal', 'Haze': 'normal', 'Baton Pass': 'normal', 'Encore': 'normal',
   'Taunt': 'normal', 'Toxic': 'poison', 'Whirlwind': 'normal', 'Roar': 'normal',
   'Entrainment': 'normal', 'Minimize': 'normal', 'Rapid Spin': 'normal', 'Population Bomb': 'normal',
+  'Weather Ball': 'normal',
 
   // Fire
   'Flamethrower': 'fire', 'Fire Blast': 'fire', 'Overheat': 'fire', 'Heat Wave': 'fire',
   'Lava Plume': 'fire', 'Sacred Fire': 'fire', 'Flare Blitz': 'fire', 'Fire Fang': 'fire',
   'Will-O-Wisp': 'fire', 'Fire Spin': 'fire', 'Ember': 'fire', 'V-create': 'fire',
   'Mystical Fire': 'fire', 'Torch Song': 'fire', 'Inferno': 'fire', 'Pyro Ball': 'fire',
-  'Burning Jealousy': 'fire', 'Flame Charge': 'fire', 'Fiery Dance': 'fire',
+  'Burning Jealousy': 'fire', 'Flame Charge': 'fire', 'Fiery Dance': 'fire', 'Bitter Blade': 'fire',
 
   // Water
   'Surf': 'water', 'Scald': 'water', 'Hydro Pump': 'water', 'Waterfall': 'water',
   'Aqua Jet': 'water', 'Aqua Tail': 'water', 'Liquidation': 'water', 'Rain Dance': 'water',
   'Water Spout': 'water', 'Origin Pulse': 'water', 'Flip Turn': 'water', 'Jet Punch': 'water',
   'Chilling Water': 'water', 'Wave Crash': 'water', 'Crabhammer': 'water', 'Muddy Water': 'water',
-  'Aqua Step': 'water', 'Ice Spinner': 'ice',
+  'Aqua Step': 'water', 'Razor Shell': 'water', 'Ice Spinner': 'ice',
 
   // Electric
   'Thunderbolt': 'electric', 'Thunder': 'electric', 'Volt Switch': 'electric', 'Thunder Wave': 'electric',
@@ -75,7 +76,7 @@ export const MOVE_TYPES: Record<string, string> = {
 
   // Bug
   'Bug Buzz': 'bug', 'U-turn': 'bug', 'Leech Life': 'bug', 'Pin Missile': 'bug',
-  'Signal Beam': 'bug', 'Megahorn': 'bug', 'X-Scissor': 'bug',
+  'Signal Beam': 'bug', 'Megahorn': 'bug', 'X-Scissor': 'bug', 'Quiver Dance': 'bug',
 
   // Rock
   'Stone Edge': 'rock', 'Rock Slide': 'rock', 'Stealth Rock': 'rock', 'Head Smash': 'rock',
@@ -89,7 +90,7 @@ export const MOVE_TYPES: Record<string, string> = {
   // Dragon
   'Dragon Dance': 'dragon', 'Dragon Claw': 'dragon', 'Outrage': 'dragon', 'Draco Meteor': 'dragon',
   'Dragon Pulse': 'dragon', 'Dragon Tail': 'dragon', 'Dual Chop': 'dragon', 'Scale Shot': 'dragon',
-  'Roar of Time': 'dragon', 'Eternabeam': 'dragon',
+  'Roar of Time': 'dragon', 'Eternabeam': 'dragon', 'Dragon Darts': 'dragon',
 
   // Dark
   'Dark Pulse': 'dark', 'Crunch': 'dark', 'Knock Off': 'dark', 'Sucker Punch': 'dark',
