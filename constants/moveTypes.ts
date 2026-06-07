@@ -15,7 +15,8 @@ export const MOVE_TYPES: Record<string, string> = {
   'Flamethrower': 'fire', 'Fire Blast': 'fire', 'Overheat': 'fire', 'Heat Wave': 'fire',
   'Lava Plume': 'fire', 'Sacred Fire': 'fire', 'Flare Blitz': 'fire', 'Fire Fang': 'fire',
   'Will-O-Wisp': 'fire', 'Fire Spin': 'fire', 'Ember': 'fire', 'V-create': 'fire',
-  'Mystical Fire': 'fire', 'Torch Song': 'fire', 'Inferno': 'fire',
+  'Mystical Fire': 'fire', 'Torch Song': 'fire', 'Inferno': 'fire', 'Pyro Ball': 'fire',
+  'Burning Jealousy': 'fire', 'Flame Charge': 'fire',
 
   // Water
   'Surf': 'water', 'Scald': 'water', 'Hydro Pump': 'water', 'Waterfall': 'water',

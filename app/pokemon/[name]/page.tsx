@@ -141,23 +141,23 @@ async function PokemonDetail({ name }: { name: string }) {
             {/* Action buttons */}
             <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
               <a
-                href={`https://play.pokemonshowdown.com/teambuilder`}
+                href={`https://www.smogon.com/dex/sv/pokemon/${name}/`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
-                Showdown Teambuilder ↗
+                View on Smogon ↗
               </a>
               <a
-                href={`https://www.smogon.com/dex/sv/pokemon/${name}/`}
+                href={`https://play.pokemonshowdown.com/teambuilder`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/6 px-4 py-2 text-sm font-medium text-slate-300 hover:bg-white/12 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[40px]"
               >
-                Smogon Analysis ↗
+                Showdown Teambuilder ↗
               </a>
               <CopyLinkButton />
             </div>

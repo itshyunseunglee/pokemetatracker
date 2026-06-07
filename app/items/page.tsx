@@ -47,26 +47,31 @@ async function ItemsContent({ tier }: { tier: string }) {
 
   const top50 = stats.slice(0, 50)
   const itemMap = new Map<string, ItemEntry>()
+  let totalWeight = 0
   const rawText = await getMovesetText(month, tier).catch(() => '')
 
   for (const pokemon of top50) {
     try {
       const movesetData = parseMovesetData(rawText, pokemon.name)
       if (!movesetData) continue
+      const weight = pokemon.usagePercent / 100
+      totalWeight += weight
       for (const item of movesetData.items) {
-        if (!item.name || item.name === 'Nothing' || item.name === 'Other') continue
-        const existing = itemMap.get(item.name)
+        const itemName = item.name.trim()
+        if (!itemName || itemName === 'Nothing' || itemName === 'Other') continue
+        const existing = itemMap.get(itemName)
         if (existing) {
-          existing.totalPercent += item.percent * (pokemon.usagePercent / 100)
+          existing.totalPercent += item.percent * weight
           existing.count++
         } else {
-          itemMap.set(item.name, { name: item.name, totalPercent: item.percent * (pokemon.usagePercent / 100), count: 1 })
+          itemMap.set(itemName, { name: itemName, totalPercent: item.percent * weight, count: 1 })
         }
       }
     } catch { /* skip */ }
   }
 
   const items = Array.from(itemMap.values())
+    .map(e => ({ ...e, totalPercent: totalWeight > 0 ? Math.min(100, e.totalPercent / totalWeight) : 0 }))
     .sort((a, b) => b.totalPercent - a.totalPercent)
     .slice(0, 100)
 

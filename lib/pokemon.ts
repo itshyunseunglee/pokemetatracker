@@ -50,11 +50,12 @@ export function getPokemonImageUrls(name: string): string[] {
 // For table-row small sprites
 export function getPokemonSpriteUrls(name: string): string[] {
   const id = getPokemonId(name)
-  const showdownPixel = getShowdownPixelUrl(name)
+  const showdownDex = getShowdownSpriteUrl(name)   // /sprites/dex/ — exists for all Pokemon incl. Gen 9
+  const showdownPixel = getShowdownPixelUrl(name)   // /sprites/gen5/ — may be missing for Gen 9
   if (id) {
-    return [getPixelSpriteUrl(id), showdownPixel]
+    return [showdownDex, getPixelSpriteUrl(id), showdownPixel]
   }
-  return [showdownPixel]
+  return [showdownDex, showdownPixel]
 }
 
 // Legacy — kept for backward compat; always returns a URL (never null)

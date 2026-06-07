@@ -63,7 +63,22 @@ async function TrendsContent({ tier }: { tier: string }) {
     <div className="space-y-8">
       {/* Search + Chart — client interactive */}
       <ErrorBoundary>
-        <Suspense fallback={<div className="h-96 animate-pulse bg-white/5 rounded-xl" />}>
+        <Suspense fallback={
+          <div className="space-y-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search Pokemon (e.g. Garchomp)..."
+                disabled
+                className="w-full rounded-lg bg-white/10 border border-white/15 px-4 py-3 text-slate-100 placeholder-slate-500 text-sm min-h-[44px] opacity-60 cursor-not-allowed"
+                aria-label="Search Pokemon for trend chart"
+              />
+            </div>
+            <div className="rounded-xl bg-[#1a1a24] border border-white/6 p-6">
+              <div className="h-80 animate-pulse bg-white/5 rounded-lg" />
+            </div>
+          </div>
+        }>
           <SearchTrendClient
             defaultSeries={defaultSeries}
             allPokemonNames={allNames}

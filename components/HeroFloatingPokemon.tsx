@@ -41,8 +41,7 @@ export default async function HeroFloatingPokemon() {
     const stats = await getUsageStats(month, 'gen9ou').catch(() => [])
     if (stats.length < 10) return null
 
-    const top50Names = stats.slice(0, 50).map((s) => s.name)
-    const daily = pickDailyPokemon(top50Names, 5)
+    const daily = stats.slice(0, 5).map((s) => s.name)
 
     return (
       <div

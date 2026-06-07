@@ -64,26 +64,31 @@ async function MovesContent({ tier }: { tier: string }) {
 
   const top50 = stats.slice(0, 50)
   const moveMap = new Map<string, MoveEntry>()
+  let totalWeight = 0
 
   const rawText = await getMovesetText(month, tier).catch(() => '')
   for (const pokemon of top50) {
     try {
       const movesetData = parseMovesetData(rawText, pokemon.name)
       if (!movesetData) continue
+      const weight = pokemon.usagePercent / 100
+      totalWeight += weight
       for (const move of movesetData.moves) {
-        if (!move.name || move.name === 'Other') continue
-        const existing = moveMap.get(move.name)
+        const moveName = move.name.trim()
+        if (!moveName || moveName === 'Other') continue
+        const existing = moveMap.get(moveName)
         if (existing) {
-          existing.totalPercent += move.percent * (pokemon.usagePercent / 100)
+          existing.totalPercent += move.percent * weight
           existing.count++
         } else {
-          moveMap.set(move.name, { name: move.name, totalPercent: move.percent * (pokemon.usagePercent / 100), count: 1 })
+          moveMap.set(moveName, { name: moveName, totalPercent: move.percent * weight, count: 1 })
         }
       }
     } catch { /* skip */ }
   }
 
   const moves = Array.from(moveMap.values())
+    .map(e => ({ ...e, totalPercent: totalWeight > 0 ? Math.min(100, e.totalPercent / totalWeight) : 0 }))
     .sort((a, b) => b.totalPercent - a.totalPercent)
     .slice(0, 100)
 
