@@ -4,6 +4,7 @@ import { getLatestMonth, getAvailableTiers, getMovesetText, parseMovesetData, ge
 import ErrorBoundary from '@/components/ErrorBoundary'
 import SkeletonTable from '@/components/SkeletonTable'
 import TierSelector from '@/components/TierSelector'
+import ItemImage from '@/components/ItemImage'
 
 export const revalidate = 86400
 
@@ -86,10 +87,6 @@ async function ItemsContent({ tier }: { tier: string }) {
 
   const top5 = items.slice(0, 5)
 
-  function itemIconUrl(name: string): string {
-    return `https://www.smogon.com/dex/media/items/${name.toLowerCase().replace(/\s+/g, '-')}.png`
-  }
-
   return (
     <div className="space-y-8">
       {/* Top 5 highlight */}
@@ -97,15 +94,7 @@ async function ItemsContent({ tier }: { tier: string }) {
         {top5.map((item, i) => (
           <div key={item.name} className="rounded-xl bg-[#1a1a24] border border-white/6 p-4 text-center">
             <span className="text-slate-500 text-xs">#{i + 1}</span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={itemIconUrl(item.name)}
-              alt=""
-              width={40}
-              height={40}
-              className="mx-auto my-2 w-10 h-10 object-contain"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-            />
+            <ItemImage name={item.name} size={40} />
             <p className="text-sm font-semibold text-white truncate">{item.name}</p>
             <p className="text-amber-400 font-bold">{item.totalPercent.toFixed(2)}%</p>
           </div>
@@ -134,15 +123,7 @@ async function ItemsContent({ tier }: { tier: string }) {
                 <td className="py-2.5 px-4 text-slate-400 font-mono text-sm">{i + 1}</td>
                 <td className="py-2.5 px-4">
                   <div className="flex items-center gap-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={itemIconUrl(item.name)}
-                      alt=""
-                      width={24}
-                      height={24}
-                      className="w-6 h-6 object-contain flex-shrink-0"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                    />
+                    <ItemImage name={item.name} size={24} />
                     <span className="text-slate-100 font-medium">{item.name}</span>
                   </div>
                 </td>

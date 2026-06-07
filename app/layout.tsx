@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',
   description:
     'Track Pokemon Showdown competitive meta trends, usage stats, movesets, and tier rankings updated monthly from Smogon data.',
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL('https://pokemetatracker-psi.vercel.app'),
   alternates: { canonical: SITE_URL },
   openGraph: {
     title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',
