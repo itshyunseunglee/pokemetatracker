@@ -4,7 +4,7 @@ Track the Pokemon Showdown competitive meta with real Smogon usage data.
 
 [Live site](https://pokemetatracker-psi.vercel.app)
 
-![Gen 9 OU tier rankings — Great Tusk #1](public/screenshot-home.png)
+![PokeMetaTracker home page with floating Pokemon](public/screenshot-home.png)
 
 ## What it does
 
