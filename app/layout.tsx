@@ -32,7 +32,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <head>
-        {/* <meta name="google-site-verification" content="YOUR_CODE_HERE" /> */}
+        <meta name="google-site-verification" content="fQmix3taVlm19n7yQShQpyXbd63iQ2u2IQykePVAF7w" />
       </head>
       <body className="min-h-screen bg-[#0f0f13] text-slate-100 antialiased overflow-x-hidden">
         <Nav />
