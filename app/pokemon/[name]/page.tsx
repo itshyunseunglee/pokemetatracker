@@ -8,7 +8,6 @@ import {
   getUsageStats,
   getMovesetText,
   parseMovesetData,
-  getMonthlyUsageForPokemon,
   getAvailableMonths,
 } from '@/lib/smogon'
 import { normalizeSmogonName, getPokemonImageUrls, pokemonData } from '@/lib/pokemon'
@@ -17,7 +16,7 @@ import UsageBar from '@/components/UsageBar'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import SmartPokemonImage from '@/components/SmartPokemonImage'
 import CopyLinkButton from '@/components/CopyLinkButton'
-import TrendChartWrapper from '@/app/trends/TrendChartWrapper'
+import PokemonTrendSection from '@/components/PokemonTrendSection'
 
 export const revalidate = 86400
 
@@ -100,8 +99,6 @@ async function PokemonDetail({ name }: { name: string }) {
     const rawText = await getMovesetText(month, mainTier)
     movesetData = parseMovesetData(rawText, smogonName)
   } catch { /* skip */ }
-
-  const trendData = await getMonthlyUsageForPokemon(smogonName, mainTier, last6)
   const pokeInfo = pokemonData[name] ?? pokemonData[name.split('-')[0]]
   const imageUrls = getPokemonImageUrls(name)
   const displayName = name.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -294,13 +291,16 @@ async function PokemonDetail({ name }: { name: string }) {
         </div>
       )}
 
-      {trendData.length > 0 && (
+      {last6.length > 0 && (
         <ErrorBoundary>
           <div className="rounded-xl bg-[#1a1a24] border border-white/6 p-6">
             <h2 className="text-lg font-semibold text-white mb-4">6-Month Usage Trend</h2>
-            <Suspense fallback={<div className="h-64 animate-pulse bg-white/5 rounded-lg" />}>
-              <TrendChartWrapper series={[{ name: displayName, color: '#6366f1', data: trendData }]} />
-            </Suspense>
+            <PokemonTrendSection
+              pokemonName={smogonName}
+              displayName={displayName}
+              tier={mainTier}
+              months={last6}
+            />
           </div>
         </ErrorBoundary>
       )}

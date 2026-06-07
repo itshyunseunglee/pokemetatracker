@@ -330,8 +330,9 @@ export function parseMovesetData(text: string, pokemonName: string): MovesetData
           }
           pendingCounterName = ''
         } else if (/^[A-Za-z]/.test(content)) {
-          // Name comes before 2+ spaces then the numeric score
-          const nameMatch = content.match(/^([A-Za-z][A-Za-z0-9\s\-'.]+?)\s{2,}\d/)
+          // Counter line format: "Name   1.234 (kp ± err)" OR "Name   | 1.234 | (kp ± err)"
+          // The pipe variant occurs when Smogon uses multi-column table formatting.
+          const nameMatch = content.match(/^([A-Za-z][A-Za-z0-9\s\-'.]+?)(\s{2,}|\s*\|)\s*[\d|]/)
           if (nameMatch) pendingCounterName = nameMatch[1].trim()
         }
       }
