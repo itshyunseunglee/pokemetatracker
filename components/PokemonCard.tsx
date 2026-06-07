@@ -29,7 +29,9 @@ function RankDelta({ change }: { change: number | 'NEW' | undefined }): React.JS
 const PokemonCard = memo(function PokemonCard({ name, rank, usagePercent, rankChange }: Props): React.JSX.Element {
   const normalized = normalizeSmogonName(name)
   const imageUrls = getPokemonImageUrls(name)
-  const displayName = name.replace(/-/g, ' ')
+  const displayName = /[A-Z]/.test(name)
+    ? name
+    : name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
   return (
     <Link

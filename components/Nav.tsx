@@ -25,7 +25,7 @@ export default function Nav(): React.JSX.Element {
         </Link>
 
         {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-1">
+        <ul className="hidden md:flex list-none items-center gap-1">
           {NAV_LINKS.map((link) => (
             <li key={link.href}>
               <Link

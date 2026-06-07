@@ -16,7 +16,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Lava Plume': 'fire', 'Sacred Fire': 'fire', 'Flare Blitz': 'fire', 'Fire Fang': 'fire',
   'Will-O-Wisp': 'fire', 'Fire Spin': 'fire', 'Ember': 'fire', 'V-create': 'fire',
   'Mystical Fire': 'fire', 'Torch Song': 'fire', 'Inferno': 'fire', 'Pyro Ball': 'fire',
-  'Burning Jealousy': 'fire', 'Flame Charge': 'fire',
+  'Burning Jealousy': 'fire', 'Flame Charge': 'fire', 'Fiery Dance': 'fire',
 
   // Water
   'Surf': 'water', 'Scald': 'water', 'Hydro Pump': 'water', 'Waterfall': 'water',
@@ -30,7 +30,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Wild Charge': 'electric', 'Discharge': 'electric', 'Zap Cannon': 'electric',
   'Volt Tackle': 'electric', 'Parabolic Charge': 'electric', 'Electroweb': 'electric',
   'Thunder Punch': 'electric', 'Charge Beam': 'electric', 'Nuzzle': 'electric',
-  'Rising Voltage': 'electric', 'Aura Sphere': 'fighting',
+  'Rising Voltage': 'electric', 'Thunderclap': 'electric', 'Aura Sphere': 'fighting',
 
   // Grass
   'Energy Ball': 'grass', 'Giga Drain': 'grass', 'Leaf Storm': 'grass', 'Power Whip': 'grass',
@@ -55,7 +55,7 @@ export const MOVE_TYPES: Record<string, string> = {
 
   // Poison
   'Sludge Bomb': 'poison', 'Sludge Wave': 'poison', 'Poison Jab': 'poison', 'Gunk Shot': 'poison',
-  'Venoshock': 'poison', 'Cross Poison': 'poison',
+  'Venoshock': 'poison', 'Cross Poison': 'poison', 'Mortal Spin': 'poison',
 
   // Ground
   'Earthquake': 'ground', 'Earth Power': 'ground', 'Precipice Blades': 'ground',
@@ -94,7 +94,7 @@ export const MOVE_TYPES: Record<string, string> = {
   // Dark
   'Dark Pulse': 'dark', 'Crunch': 'dark', 'Knock Off': 'dark', 'Sucker Punch': 'dark',
   'Night Slash': 'dark', 'Wicked Blow': 'dark', 'Foul Play': 'dark', 'Snarl': 'dark',
-  'Pursuit': 'dark', 'Thief': 'dark', 'Payback': 'dark', 'Parting Shot': 'dark',
+  'Pursuit': 'dark', 'Thief': 'dark', 'Payback': 'dark', 'Parting Shot': 'dark', 'Ruination': 'dark',
 
   // Steel
   'Iron Head': 'steel', 'Flash Cannon': 'steel', 'Meteor Mash': 'steel', 'Bullet Punch': 'steel',

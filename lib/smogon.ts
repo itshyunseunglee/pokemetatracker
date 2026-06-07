@@ -214,8 +214,9 @@ export function parseUsageStats(text: string): UsageStat[] {
 export function parseMovesetData(text: string, pokemonName: string): MovesetData | null {
   try {
     const normalized = pokemonName.toLowerCase().trim()
-    // Split by separator lines like "+----------------------------------------+"
-    const sections = text.split(/\+[-]+\+/m)
+    // Split by full separator lines (including multi-column separators like "+------+----+")
+    // Using \r?\n to handle both Unix and Windows line endings
+    const sections = text.split(/\r?\n\+[-+]+\+[ \t]*\r?\n/)
 
     // Find the section that contains exactly the Pokemon name (no % or :)
     let nameIdx = -1
@@ -241,9 +242,10 @@ export function parseMovesetData(text: string, pokemonName: string): MovesetData
       const contentLines = sections[i].split('\n')
         .map((l) => l.replace(/^\s*\|\s*/, '').replace(/\s*\|\s*$/, '').trim())
         .filter((l) => l.length > 0)
-      // Detect start of next Pokemon's block: single-line section that is not a known header
+      // Detect start of next Pokemon's block: single line starting with a letter, not a known header
       if (
         contentLines.length === 1 &&
+        /^[A-Za-z]/.test(contentLines[0]) &&
         !knownHeaders.has(contentLines[0].toLowerCase()) &&
         !contentLines[0].includes('%') &&
         !contentLines[0].includes(':') &&
