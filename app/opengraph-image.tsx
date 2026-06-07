@@ -5,15 +5,34 @@ export const alt = 'PokeMetaTracker — Pokemon Showdown Meta Statistics'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-// Sprite URLs — PokeAPI official artwork, always 200
-const SPRITES = {
-  greatTusk:  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/984.png',
-  gholdengo:  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1000.png',
-  kingambit:  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/983.png',
-  dragonite:  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png',
+async function fetchSprite(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, { cache: 'force-cache' })
+    if (!res.ok) return ''
+    const buf = await res.arrayBuffer()
+    const bytes = new Uint8Array(buf)
+    let binary = ''
+    const chunk = 8192
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...Array.from(bytes.subarray(i, i + chunk)))
+    }
+    return `data:image/png;base64,${btoa(binary)}`
+  } catch {
+    return ''
+  }
 }
 
-export default function OGImage() {
+export default async function OGImage() {
+  // Fetch sprites as base64 so satori doesn't need to make network calls during rendering
+  const [greatTusk, gholdengo, dragonite, kingambit] = await Promise.all([
+    fetchSprite('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/984.png'),
+    fetchSprite('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1000.png'),
+    fetchSprite('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png'),
+    fetchSprite('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/983.png'),
+  ])
+
+  const hasSprites = greatTusk || gholdengo || dragonite || kingambit
+
   return new ImageResponse(
     (
       <div
@@ -24,35 +43,47 @@ export default function OGImage() {
           display: 'flex',
           fontFamily: 'system-ui, -apple-system, sans-serif',
           position: 'relative',
-          overflow: 'hidden',
         }}
       >
-        {/* Indigo glow orb behind sprites */}
+        {/* Top shimmer line */}
         <div
           style={{
             position: 'absolute',
-            right: -40,
-            top: -40,
-            width: 520,
-            height: 520,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(99,102,241,0.22) 0%, rgba(99,102,241,0) 70%)',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            background: 'linear-gradient(90deg, transparent, #6366f1, #a855f7, transparent)',
             display: 'flex',
           }}
         />
 
-        {/* ── Left content column ─────────────────────────── */}
+        {/* Soft indigo glow — top-right */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -80,
+            right: -60,
+            width: 480,
+            height: 480,
+            borderRadius: '50%',
+            background: 'rgba(99,102,241,0.12)',
+            display: 'flex',
+          }}
+        />
+
+        {/* ── Left content ───────────────────────── */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             padding: '70px 64px',
-            flex: 1,
+            width: hasSprites ? 730 : 1200,
             zIndex: 1,
           }}
         >
-          {/* Live badge */}
+          {/* Badge */}
           <div
             style={{
               display: 'flex',
@@ -87,7 +118,7 @@ export default function OGImage() {
             </span>
           </div>
 
-          {/* Logo + title */}
+          {/* Brand */}
           <div style={{ display: 'flex', flexDirection: 'column', marginBottom: 18 }}>
             <span
               style={{
@@ -130,7 +161,6 @@ export default function OGImage() {
               color: '#94a3b8',
               lineHeight: 1.5,
               marginBottom: 44,
-              maxWidth: 520,
             }}
           >
             Real-time usage stats · Move &amp; Item trends · Gen 1–9 coverage
@@ -145,140 +175,80 @@ export default function OGImage() {
               borderTop: '1.5px solid rgba(255,255,255,0.09)',
             }}
           >
-            {[
-              ['1000+', 'Pokemon'],
-              ['50+', 'Formats'],
-              ['Monthly', 'Updates'],
-            ].map(([val, label]) => (
-              <div
-                key={label}
-                style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
-              >
-                <span
-                  style={{ fontSize: 30, fontWeight: 900, color: 'white' }}
-                >
-                  {val}
-                </span>
-                <span
-                  style={{
-                    fontSize: 12,
-                    color: '#64748b',
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {label}
-                </span>
+            {([['1000+', 'Pokemon'], ['50+', 'Formats'], ['Monthly', 'Updates']] as [string, string][]).map(([val, label]) => (
+              <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span style={{ fontSize: 30, fontWeight: 900, color: 'white' }}>{val}</span>
+                <span style={{ fontSize: 12, color: '#64748b', letterSpacing: '0.12em', textTransform: 'uppercase' }}>{label}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ── Right sprite panel ─────────────────────────── */}
-        <div
-          style={{
-            width: 420,
-            display: 'flex',
-            position: 'relative',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-        >
-          {/* Subtle divider */}
+        {/* ── Right sprite panel (only if fetches succeeded) ── */}
+        {hasSprites && (
           <div
             style={{
-              position: 'absolute',
-              left: 0,
-              top: 60,
-              bottom: 60,
-              width: 1,
-              background: 'rgba(255,255,255,0.06)',
               display: 'flex',
+              flex: 1,
+              position: 'relative',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
-          />
+          >
+            {/* Divider */}
+            <div
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 60,
+                bottom: 60,
+                width: 1,
+                background: 'rgba(255,255,255,0.07)',
+                display: 'flex',
+              }}
+            />
 
-          {/* Great Tusk — center-left, large */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={SPRITES.greatTusk}
-            width={210}
-            height={210}
-            style={{
-              position: 'absolute',
-              bottom: 120,
-              left: 40,
-            }}
-          />
+            {/* Great Tusk — center, largest */}
+            {greatTusk && (
+              <img
+                src={greatTusk}
+                width={200}
+                height={200}
+                style={{ position: 'absolute', bottom: 130, left: 50 }}
+              />
+            )}
 
-          {/* Gholdengo — top-right */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={SPRITES.gholdengo}
-            width={165}
-            height={165}
-            style={{
-              position: 'absolute',
-              top: 55,
-              right: 30,
-              opacity: 0.88,
-            }}
-          />
+            {/* Gholdengo — top right */}
+            {gholdengo && (
+              <img
+                src={gholdengo}
+                width={160}
+                height={160}
+                style={{ position: 'absolute', top: 50, right: 40, opacity: 0.85 }}
+              />
+            )}
 
-          {/* Dragonite — bottom-right */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={SPRITES.dragonite}
-            width={148}
-            height={148}
-            style={{
-              position: 'absolute',
-              bottom: 55,
-              right: 28,
-              opacity: 0.80,
-            }}
-          />
+            {/* Dragonite — bottom right */}
+            {dragonite && (
+              <img
+                src={dragonite}
+                width={145}
+                height={145}
+                style={{ position: 'absolute', bottom: 55, right: 38, opacity: 0.80 }}
+              />
+            )}
 
-          {/* Kingambit — top-left, partially behind others */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={SPRITES.kingambit}
-            width={130}
-            height={130}
-            style={{
-              position: 'absolute',
-              top: 70,
-              left: 30,
-              opacity: 0.70,
-            }}
-          />
-        </div>
-
-        {/* Top shimmer line */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 2,
-            background: 'linear-gradient(90deg, transparent 0%, rgba(99,102,241,0.6) 40%, rgba(168,85,247,0.5) 70%, transparent 100%)',
-            display: 'flex',
-          }}
-        />
-
-        {/* Bottom shimmer line */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            height: 1,
-            background: 'rgba(255,255,255,0.05)',
-            display: 'flex',
-          }}
-        />
+            {/* Kingambit — top left, behind */}
+            {kingambit && (
+              <img
+                src={kingambit}
+                width={125}
+                height={125}
+                style={{ position: 'absolute', top: 75, left: 35, opacity: 0.65 }}
+              />
+            )}
+          </div>
+        )}
       </div>
     ),
     { width: 1200, height: 630 }
