@@ -11,7 +11,8 @@ export const MOVE_TYPES: Record<string, string> = {
   'Taunt': 'normal', 'Toxic': 'poison', 'Whirlwind': 'normal', 'Roar': 'normal',
   'Entrainment': 'normal', 'Minimize': 'normal', 'Rapid Spin': 'normal', 'Population Bomb': 'normal',
   'Weather Ball': 'normal', 'Court Change': 'normal', 'Tidy Up': 'normal', 'Revival Blessing': 'normal',
-  'Fillet Away': 'normal', 'Blood Moon': 'normal',
+  'Fillet Away': 'normal', 'Blood Moon': 'normal', 'Rest': 'normal', 'Sleep Talk': 'normal',
+  'Morning Sun': 'normal',
 
   // Fire
   'Flamethrower': 'fire', 'Fire Blast': 'fire', 'Overheat': 'fire', 'Heat Wave': 'fire',
@@ -62,6 +63,7 @@ export const MOVE_TYPES: Record<string, string> = {
   // Poison
   'Sludge Bomb': 'poison', 'Sludge Wave': 'poison', 'Poison Jab': 'poison', 'Gunk Shot': 'poison',
   'Venoshock': 'poison', 'Cross Poison': 'poison', 'Mortal Spin': 'poison', 'Malignant Chain': 'poison',
+  'Toxic Spikes': 'poison',
 
   // Ground
   'Earthquake': 'ground', 'Earth Power': 'ground', 'Precipice Blades': 'ground',
@@ -78,7 +80,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Future Sight': 'psychic', 'Trick Room': 'psychic', 'Trick': 'psychic', 'Healing Wish': 'psychic',
   'Lunar Dance': 'psychic', 'Teleport': 'psychic', 'Reflect': 'psychic', 'Light Screen': 'psychic',
   'Expanding Force': 'psychic', 'Lumina Crash': 'psychic', 'Twin Beam': 'psychic',
-  'Psychic Noise': 'psychic', 'Psyblade': 'psychic', 'Armor Cannon': 'fire',
+  'Psychic Noise': 'psychic', 'Psyblade': 'psychic', 'Armor Cannon': 'fire', 'Mirror Coat': 'psychic',
 
   // Bug
   'Bug Buzz': 'bug', 'U-turn': 'bug', 'Leech Life': 'bug', 'Pin Missile': 'bug',
@@ -94,7 +96,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Shadow Ball': 'ghost', 'Shadow Claw': 'ghost', 'Hex': 'ghost', 'Poltergeist': 'ghost',
   'Phantom Force': 'ghost', 'Shadow Sneak': 'ghost', 'Rage Fist': 'ghost',
   'Destiny Bond': 'ghost', 'Pain Split': 'normal', 'Astral Barrage': 'ghost',
-  'Bitter Malice': 'ghost', 'Last Respects': 'ghost',
+  'Bitter Malice': 'ghost', 'Last Respects': 'ghost', 'Curse': 'ghost',
 
   // Dragon
   'Dragon Dance': 'dragon', 'Dragon Claw': 'dragon', 'Outrage': 'dragon', 'Draco Meteor': 'dragon',

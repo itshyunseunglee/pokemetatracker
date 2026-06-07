@@ -25,25 +25,27 @@ export default function Nav(): React.JSX.Element {
         </Link>
 
         {/* Desktop nav */}
-        <ul className="hidden md:flex list-none items-center gap-1">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px] inline-flex items-center ${
-                  pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href.split('/').slice(0, 2).join('/')))
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-slate-300 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-          <li className="ml-2">
+        <div className="hidden md:flex items-center gap-1">
+          <ul className="flex list-none items-center gap-1">
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px] inline-flex items-center ${
+                    pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href.split('/').slice(0, 2).join('/')))
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-300 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="ml-2">
             <NavSearch />
-          </li>
-        </ul>
+          </div>
+        </div>
 
         {/* Mobile hamburger */}
         <button
