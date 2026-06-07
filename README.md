@@ -4,13 +4,13 @@ Track the Pokemon Showdown competitive meta with real Smogon usage data.
 
 [Live site](https://pokemetatracker-psi.vercel.app)
 
-![PokeMetaTracker home page](public/screenshot-home.png)
+![Gen 9 OU tier rankings — Great Tusk #1](public/screenshot-home.png)
 
 ## What it does
 
 PokeMetaTracker pulls monthly usage statistics from Smogon and presents them in a way that's actually useful: you can browse any competitive tier from Gen 1 through Gen 9, see which Pokemon are rising or falling, and dig into individual movesets, items, teammates, and counters. The data covers over 1,000 Pokemon across 100+ formats and updates automatically each month when Smogon publishes new stats.
 
-![Pokemon detail page — Great Tusk](public/screenshot-detail.png)
+![Move Trends — type-tagged move rankings](public/screenshot-detail.png)
 
 ## Tech stack
 
