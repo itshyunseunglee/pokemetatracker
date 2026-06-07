@@ -46,7 +46,8 @@ export const PokemonRowClient = memo(function PokemonRowClient({
             alt={`${name} artwork`}
             width={80}
             height={80}
-            loading="lazy"
+            priority={rank <= 3}
+            loading={rank <= 5 ? 'eager' : 'lazy'}
           />
         </div>
         <p className="text-sm font-semibold text-slate-100 capitalize text-center mt-1">{name}</p>
@@ -67,7 +68,8 @@ export const PokemonRowClient = memo(function PokemonRowClient({
               alt={`${name} sprite`}
               width={40}
               height={40}
-              loading="lazy"
+              priority={rank <= 3}
+              loading={rank <= 10 ? 'eager' : 'lazy'}
             />
           </div>
           <span className="text-slate-100 font-medium hover:text-indigo-400 transition-colors capitalize">{name}</span>

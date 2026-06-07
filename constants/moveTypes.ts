@@ -9,7 +9,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Substitute': 'normal', 'Swords Dance': 'normal', 'Nasty Plot': 'normal', 'Calm Mind': 'normal',
   'Amnesia': 'normal', 'Haze': 'normal', 'Baton Pass': 'normal', 'Encore': 'normal',
   'Taunt': 'normal', 'Toxic': 'poison', 'Whirlwind': 'normal', 'Roar': 'normal',
-  'Entrainment': 'normal', 'Minimize': 'normal', 'Rapid Spin': 'normal',
+  'Entrainment': 'normal', 'Minimize': 'normal', 'Rapid Spin': 'normal', 'Population Bomb': 'normal',
 
   // Fire
   'Flamethrower': 'fire', 'Fire Blast': 'fire', 'Overheat': 'fire', 'Heat Wave': 'fire',
@@ -23,7 +23,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Aqua Jet': 'water', 'Aqua Tail': 'water', 'Liquidation': 'water', 'Rain Dance': 'water',
   'Water Spout': 'water', 'Origin Pulse': 'water', 'Flip Turn': 'water', 'Jet Punch': 'water',
   'Chilling Water': 'water', 'Wave Crash': 'water', 'Crabhammer': 'water', 'Muddy Water': 'water',
-  'Ice Spinner': 'ice',
+  'Aqua Step': 'water', 'Ice Spinner': 'ice',
 
   // Electric
   'Thunderbolt': 'electric', 'Thunder': 'electric', 'Volt Switch': 'electric', 'Thunder Wave': 'electric',
@@ -71,7 +71,7 @@ export const MOVE_TYPES: Record<string, string> = {
   'Psychic': 'psychic', 'Psyshock': 'psychic', 'Psystrike': 'psychic', 'Zen Headbutt': 'psychic',
   'Future Sight': 'psychic', 'Trick Room': 'psychic', 'Trick': 'psychic', 'Healing Wish': 'psychic',
   'Lunar Dance': 'psychic', 'Teleport': 'psychic', 'Reflect': 'psychic', 'Light Screen': 'psychic',
-  'Expanding Force': 'psychic', 'Armor Cannon': 'fire',
+  'Expanding Force': 'psychic', 'Lumina Crash': 'psychic', 'Twin Beam': 'psychic', 'Armor Cannon': 'fire',
 
   // Bug
   'Bug Buzz': 'bug', 'U-turn': 'bug', 'Leech Life': 'bug', 'Pin Missile': 'bug',
@@ -83,7 +83,7 @@ export const MOVE_TYPES: Record<string, string> = {
 
   // Ghost
   'Shadow Ball': 'ghost', 'Shadow Claw': 'ghost', 'Hex': 'ghost', 'Poltergeist': 'ghost',
-  'Phantom Force': 'ghost', 'Shadow Sneak': 'ghost',
+  'Phantom Force': 'ghost', 'Shadow Sneak': 'ghost', 'Rage Fist': 'ghost',
   'Destiny Bond': 'ghost', 'Pain Split': 'normal',
 
   // Dragon

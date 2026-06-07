@@ -86,6 +86,10 @@ async function ItemsContent({ tier }: { tier: string }) {
 
   const top5 = items.slice(0, 5)
 
+  function itemIconUrl(name: string): string {
+    return `https://www.smogon.com/dex/media/items/${name.toLowerCase().replace(/\s+/g, '-')}.png`
+  }
+
   return (
     <div className="space-y-8">
       {/* Top 5 highlight */}
@@ -93,7 +97,16 @@ async function ItemsContent({ tier }: { tier: string }) {
         {top5.map((item, i) => (
           <div key={item.name} className="rounded-xl bg-[#1a1a24] border border-white/6 p-4 text-center">
             <span className="text-slate-500 text-xs">#{i + 1}</span>
-            <p className="text-sm font-semibold text-white mt-1 truncate">{item.name}</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={itemIconUrl(item.name)}
+              alt=""
+              width={40}
+              height={40}
+              className="mx-auto my-2 w-10 h-10 object-contain"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+            />
+            <p className="text-sm font-semibold text-white truncate">{item.name}</p>
             <p className="text-amber-400 font-bold">{item.totalPercent.toFixed(2)}%</p>
           </div>
         ))}
@@ -106,14 +119,27 @@ async function ItemsContent({ tier }: { tier: string }) {
             <tr className="bg-white/5 text-left">
               <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Rank</th>
               <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Item</th>
-              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Weighted Usage %</th>
+              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Aggregate Usage %</th>
             </tr>
           </thead>
           <tbody>
             {items.map((item, i) => (
               <tr key={item.name} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="py-2.5 px-4 text-slate-400 font-mono text-sm">{i + 1}</td>
-                <td className="py-2.5 px-4 text-slate-100 font-medium">{item.name}</td>
+                <td className="py-2.5 px-4">
+                  <div className="flex items-center gap-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={itemIconUrl(item.name)}
+                      alt=""
+                      width={24}
+                      height={24}
+                      className="w-6 h-6 object-contain flex-shrink-0"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    />
+                    <span className="text-slate-100 font-medium">{item.name}</span>
+                  </div>
+                </td>
                 <td className="py-2.5 px-4 text-amber-400 font-semibold">{item.totalPercent.toFixed(2)}%</td>
               </tr>
             ))}
