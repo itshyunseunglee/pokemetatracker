@@ -23,6 +23,7 @@ export const revalidate = 86400
 
 interface PokemonPageProps {
   params: Promise<{ name: string }>
+  searchParams: Promise<{ tier?: string }>
 }
 
 export async function generateStaticParams() {
@@ -76,7 +77,7 @@ function StatBar({ label, value }: { label: string; value: number }) {
   )
 }
 
-async function PokemonDetail({ name }: { name: string }) {
+async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: string }) {
   const month = await getLatestMonth()
   const allMonths = await getAvailableMonths()
   const last6 = allMonths.slice(0, 6).reverse()
@@ -97,8 +98,9 @@ async function PokemonDetail({ name }: { name: string }) {
     .filter((r): r is NonNullable<typeof r> => r !== null)
     .map(({ tier, usagePercent, rank }) => ({ tier, usagePercent, rank }))
 
-  // Use the highest-priority tier where this Pokemon actually appears
-  const firstMatch = tierSearchResults.find((r) => r !== null)
+  // Prefer the tier the user navigated from (hintTier), else use highest-priority match
+  const hintMatch = hintTier ? tierSearchResults.find((r) => r?.tier === hintTier) ?? null : null
+  const firstMatch = hintMatch ?? tierSearchResults.find((r) => r !== null)
   const smogonName = firstMatch?.smogonName ?? name
   const mainTier = firstMatch?.tier ?? tiers[0] ?? 'gen9ou'
 
@@ -323,8 +325,9 @@ async function PokemonDetail({ name }: { name: string }) {
   )
 }
 
-export default async function PokemonPage({ params }: PokemonPageProps) {
+export default async function PokemonPage({ params, searchParams }: PokemonPageProps) {
   const { name } = await params
+  const { tier: hintTier } = await searchParams
   if (name !== name.toLowerCase()) notFound()
 
   return (
@@ -340,7 +343,7 @@ export default async function PokemonPage({ params }: PokemonPageProps) {
           </div>
         }
       >
-        <PokemonDetail name={name.toLowerCase()} />
+        <PokemonDetail name={name.toLowerCase()} hintTier={hintTier} />
       </Suspense>
     </ErrorBoundary>
   )

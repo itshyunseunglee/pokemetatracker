@@ -24,19 +24,21 @@ interface RowProps {
   rawCount: number
   rankChange: number | 'NEW' | undefined
   view: 'table' | 'card'
+  sourceTier?: string
 }
 
 export const PokemonRowClient = memo(function PokemonRowClient({
-  rank, name, usagePercent, rawCount, rankChange, view,
+  rank, name, usagePercent, rawCount, rankChange, view, sourceTier,
 }: RowProps): React.JSX.Element {
   const normalized = normalizeSmogonName(name)
   const artworkUrls = getPokemonImageUrls(name)
   const spriteUrls = getPokemonSpriteUrls(name)
+  const pokemonHref = sourceTier ? `/pokemon/${normalized}?tier=${sourceTier}` : `/pokemon/${normalized}`
 
   if (view === 'card') {
     return (
       <Link
-        href={`/pokemon/${normalized}`}
+        href={pokemonHref}
         className="flex flex-col items-center rounded-xl bg-[#1a1a24] border border-white/6 p-4 hover:border-indigo-500/50 transition-all hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-indigo-500"
       >
         <span className="text-sm text-slate-500 mb-1">#{rank}</span>
@@ -61,7 +63,7 @@ export const PokemonRowClient = memo(function PokemonRowClient({
     <tr className="border-b border-white/5 hover:bg-white/5 transition-colors">
       <td className="py-3 px-4 text-slate-400 font-mono text-sm">{rank}</td>
       <td className="py-3 px-4">
-        <Link href={`/pokemon/${normalized}`} className="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded min-h-[44px]">
+        <Link href={pokemonHref} className="flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded min-h-[44px]">
           <div className="h-10 w-10 flex-shrink-0 flex items-center justify-center">
             <SmartPokemonImage
               urls={spriteUrls}

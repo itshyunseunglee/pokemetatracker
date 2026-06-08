@@ -159,6 +159,7 @@ async function TierContent({
               rawCount={pokemon.rawCount}
               rankChange={getRankChange(pokemon.name, pokemon.rank)}
               view="card"
+              sourceTier={tier}
             />
           ))}
         </div>
@@ -190,6 +191,7 @@ async function TierContent({
                 rawCount={pokemon.rawCount}
                 rankChange={getRankChange(pokemon.name, pokemon.rank)}
                 view="table"
+                sourceTier={tier}
               />
             ))}
           </tbody>
