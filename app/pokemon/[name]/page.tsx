@@ -94,10 +94,12 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
     })
   )
 
-  const tierUsages = tierSearchResults
+  const allTierUsages = tierSearchResults
     .filter((r): r is NonNullable<typeof r> => r !== null)
     .map(({ tier, usagePercent, rank }) => ({ tier, usagePercent, rank }))
     .sort((a, b) => b.usagePercent - a.usagePercent)
+  // Only show tiers with meaningful usage; always include at least the top tier
+  const tierUsages = allTierUsages.filter((tu, i) => tu.usagePercent >= 0.05 || i === 0)
 
   // Prefer hintTier (navigated from), else use highest-usage tier
   const hintMatch = hintTier ? tierSearchResults.find((r) => r?.tier === hintTier) ?? null : null
