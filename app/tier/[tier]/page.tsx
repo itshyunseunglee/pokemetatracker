@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
 
 interface TierPageProps {
   params: Promise<{ tier: string }>
-  searchParams: Promise<{ page?: string; view?: string; sort?: string; range?: string }>
+  searchParams: Promise<{ page?: string; view?: string; range?: string }>
 }
 
 export async function generateStaticParams() {
@@ -63,14 +63,12 @@ function Pagination({
   totalPages,
   tier,
   view,
-  sort,
   range,
 }: {
   page: number
   totalPages: number
   tier: string
   view: string
-  sort: string
   range: number
 }) {
   const pageCount = Math.min(totalPages, 7)
@@ -82,7 +80,7 @@ function Pagination({
     else pages.push(page - 3 + i)
   }
 
-  const href = (p: number) => `/tier/${tier}?page=${p}&view=${view}&sort=${sort}&range=${range}`
+  const href = (p: number) => `/tier/${tier}?page=${p}&view=${view}&range=${range}`
 
   return (
     <div className="flex items-center justify-center gap-2 mt-6 flex-wrap">
@@ -115,13 +113,11 @@ async function TierContent({
   tier,
   page,
   view,
-  sort,
   range,
 }: {
   tier: string
   page: number
   view: 'table' | 'card'
-  sort: 'usage' | 'raw'
   range: number
 }) {
   const month = await getLatestMonth()
@@ -153,9 +149,7 @@ async function TierContent({
     )
   }
 
-  const sorted = sort === 'raw'
-    ? [...stats].sort((a, b) => b.rawCount - a.rawCount)
-    : stats
+  const sorted = stats
 
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE)
   const paginated = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -174,7 +168,7 @@ async function TierContent({
           {paginated.map((pokemon) => (
             <PokemonRowClient
               key={pokemon.name}
-              rank={sort === 'raw' ? paginated.indexOf(pokemon) + (page - 1) * PAGE_SIZE + 1 : pokemon.rank}
+              rank={pokemon.rank}
               name={pokemon.name}
               usagePercent={pokemon.usagePercent}
               rawCount={pokemon.rawCount}
@@ -184,7 +178,7 @@ async function TierContent({
             />
           ))}
         </div>
-        <Pagination page={page} totalPages={totalPages} tier={tier} view={view} sort={sort} range={range} />
+        <Pagination page={page} totalPages={totalPages} tier={tier} view={view} range={range} />
       </>
     )
   }
@@ -207,10 +201,10 @@ async function TierContent({
             </tr>
           </thead>
           <tbody>
-            {paginated.map((pokemon, idx) => (
+            {paginated.map((pokemon) => (
               <PokemonRowClient
                 key={pokemon.name}
-                rank={sort === 'raw' ? idx + (page - 1) * PAGE_SIZE + 1 : pokemon.rank}
+                rank={pokemon.rank}
                 name={pokemon.name}
                 usagePercent={pokemon.usagePercent}
                 rawCount={pokemon.rawCount}
@@ -223,7 +217,7 @@ async function TierContent({
           </tbody>
         </table>
       </div>
-      <Pagination page={page} totalPages={totalPages} tier={tier} view={view} sort={sort} range={range} />
+      <Pagination page={page} totalPages={totalPages} tier={tier} view={view} range={range} />
     </>
   )
 }
@@ -233,7 +227,6 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
   const sp = await searchParams
   const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1)
   const view = sp.view === 'card' ? 'card' : 'table'
-  const sort = sp.sort === 'raw' ? 'raw' : 'usage'
   const rangeRaw = parseInt(sp.range ?? '1', 10)
   const range = [1, 3, 6, 12].includes(rangeRaw) ? rangeRaw : 1
 
@@ -282,13 +275,12 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
 
       <TierSelector tiers={tiers} selectedTier={tier} basePath="/tier" />
 
-      {/* Controls: view toggle + sort + range */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
         <div className="flex gap-2">
-          <a href={`/tier/${tier}?page=1&view=table&sort=${sort}&range=${range}`} className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${view === 'table' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
+          <a href={`/tier/${tier}?page=1&view=table&range=${range}`} className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${view === 'table' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
             Table View
           </a>
-          <a href={`/tier/${tier}?page=1&view=card&sort=${sort}&range=${range}`} className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${view === 'card' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
+          <a href={`/tier/${tier}?page=1&view=card&range=${range}`} className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${view === 'card' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
             Card View
           </a>
         </div>
@@ -296,26 +288,16 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
         <div className="flex gap-2">
           <span className="text-slate-500 text-sm self-center">Range:</span>
           {([1, 3, 6, 12] as const).map((r) => (
-            <a key={r} href={`/tier/${tier}?page=1&view=${view}&sort=${sort}&range=${r}`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${range === r ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
+            <a key={r} href={`/tier/${tier}?page=1&view=${view}&range=${r}`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${range === r ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
               {r === 1 ? 'Latest' : `${r}M Avg`}
             </a>
           ))}
-        </div>
-
-        <div className="flex gap-2 ml-auto">
-          <span className="text-slate-500 text-sm self-center">Sort:</span>
-          <a href={`/tier/${tier}?page=1&view=${view}&sort=usage&range=${range}`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${sort === 'usage' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
-            Usage %
-          </a>
-          <a href={`/tier/${tier}?page=1&view=${view}&sort=raw&range=${range}`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${sort === 'raw' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
-            Raw Count
-          </a>
         </div>
       </div>
 
       <ErrorBoundary>
         <Suspense fallback={<SkeletonTable rows={50} />}>
-          <TierContent tier={tier} page={page} view={view} sort={sort} range={range} />
+          <TierContent tier={tier} page={page} view={view} range={range} />
         </Suspense>
       </ErrorBoundary>
     </>

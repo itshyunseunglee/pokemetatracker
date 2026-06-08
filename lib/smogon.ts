@@ -9,6 +9,7 @@ const DEFAULT_TIERS = ['gen9ou', 'gen9uu', 'gen9ubers', 'gen9ru', 'gen9nu', 'gen
 async function smogonFetch(url: string): Promise<string> {
   const res = await fetch(url, {
     headers: { 'User-Agent': USER_AGENT },
+    cache: 'force-cache',
     next: { revalidate: 86400 },
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`)
@@ -36,6 +37,7 @@ export async function getLatestMonth(): Promise<string> {
       const url = `${BASE_URL}/${candidate}/`
       const res = await fetch(url, {
         headers: { 'User-Agent': USER_AGENT },
+        cache: 'force-cache',
         next: { revalidate: 86400 },
       })
       if (res.ok) return candidate
