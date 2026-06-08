@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Nav from '@/components/Nav'
+import { Analytics } from '@vercel/analytics/next'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pokemetatracker-psi.vercel.app'
 const OG_IMAGE = `${SITE_URL}/opengraph-image`
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-screen bg-[#0f0f13] text-slate-100 antialiased overflow-x-hidden">
         <Nav />
         <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
+        <Analytics />
         <footer className="border-t border-white/10 py-6 text-slate-500 text-sm">
           <div className="mx-auto max-w-7xl px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="text-center sm:text-left">
