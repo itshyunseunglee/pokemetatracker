@@ -395,3 +395,38 @@ export async function getUsageStats(month: string, tier: string): Promise<UsageS
     return []
   }
 }
+
+export async function getAveragedUsageStats(months: string[], tier: string): Promise<UsageStat[]> {
+  if (months.length === 1) return getUsageStats(months[0], tier)
+
+  const allMonthStats = await Promise.all(
+    months.map((m) => getUsageStats(m, tier).catch(() => [] as UsageStat[]))
+  )
+  const validMonths = allMonthStats.filter((s) => s.length > 0)
+  if (validMonths.length === 0) return []
+
+  const map = new Map<string, { totalUsage: number; totalRaw: number; totalReal: number; count: number }>()
+  for (const monthStats of validMonths) {
+    for (const entry of monthStats) {
+      const existing = map.get(entry.name)
+      if (existing) {
+        existing.totalUsage += entry.usagePercent
+        existing.totalRaw += entry.rawCount
+        existing.totalReal += entry.realCount
+        existing.count++
+      } else {
+        map.set(entry.name, { totalUsage: entry.usagePercent, totalRaw: entry.rawCount, totalReal: entry.realCount, count: 1 })
+      }
+    }
+  }
+  return Array.from(map.entries())
+    .map(([name, { totalUsage, totalRaw, totalReal, count }]) => ({
+      name,
+      usagePercent: totalUsage / count,
+      rawCount: Math.round(totalRaw / count),
+      realCount: Math.round(totalReal / count),
+      rank: 0,
+    }))
+    .sort((a, b) => b.usagePercent - a.usagePercent)
+    .map((entry, i) => ({ ...entry, rank: i + 1 }))
+}

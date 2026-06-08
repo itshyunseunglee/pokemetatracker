@@ -1,7 +1,8 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { getLatestMonth, getAvailableTiers, getUsageStats, getUsageMinElo } from '@/lib/smogon'
+import { getLatestMonth, getAvailableTiers, getUsageStats, getUsageMinElo, getAvailableMonths, getAveragedUsageStats } from '@/lib/smogon'
+import type { UsageStat } from '@/types/smogon'
 import { formatTierName, getTierColor, getTierDescription } from '@/constants/tierColors'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import SkeletonTable from '@/components/SkeletonTable'
@@ -12,7 +13,7 @@ export const revalidate = 86400
 
 interface TierPageProps {
   params: Promise<{ tier: string }>
-  searchParams: Promise<{ page?: string; view?: string; sort?: string }>
+  searchParams: Promise<{ page?: string; view?: string; sort?: string; range?: string }>
 }
 
 export async function generateStaticParams() {
@@ -63,12 +64,14 @@ function Pagination({
   tier,
   view,
   sort,
+  range,
 }: {
   page: number
   totalPages: number
   tier: string
   view: string
   sort: string
+  range: number
 }) {
   const pageCount = Math.min(totalPages, 7)
   const pages: number[] = []
@@ -79,7 +82,7 @@ function Pagination({
     else pages.push(page - 3 + i)
   }
 
-  const href = (p: number) => `/tier/${tier}?page=${p}&view=${view}&sort=${sort}`
+  const href = (p: number) => `/tier/${tier}?page=${p}&view=${view}&sort=${sort}&range=${range}`
 
   return (
     <div className="flex items-center justify-center gap-2 mt-6 flex-wrap">
@@ -113,17 +116,26 @@ async function TierContent({
   page,
   view,
   sort,
+  range,
 }: {
   tier: string
   page: number
   view: 'table' | 'card'
   sort: 'usage' | 'raw'
+  range: number
 }) {
   const month = await getLatestMonth()
-  const [stats, prevStats] = await Promise.all([
-    getUsageStats(month, tier).catch(() => []),
-    getUsageStats(getPrevMonth(month), tier).catch(() => []),
-  ])
+  const isMultiMonth = range > 1
+  const allMonths = isMultiMonth ? await getAvailableMonths() : []
+  const monthsToUse = isMultiMonth ? allMonths.slice(0, range) : [month]
+
+  const statsPromise: Promise<UsageStat[]> = isMultiMonth
+    ? getAveragedUsageStats(monthsToUse, tier).catch(() => [] as UsageStat[])
+    : getUsageStats(month, tier).catch(() => [] as UsageStat[])
+  const prevPromise: Promise<UsageStat[]> = isMultiMonth
+    ? Promise.resolve([] as UsageStat[])
+    : getUsageStats(getPrevMonth(month), tier).catch(() => [] as UsageStat[])
+  const [stats, prevStats] = await Promise.all([statsPromise, prevPromise])
 
   if (stats.length === 0) {
     return (
@@ -140,8 +152,9 @@ async function TierContent({
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE)
   const paginated = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
-  function getRankChange(name: string, currentRank: number): number | 'NEW' {
-    const prev = prevStats.find((s) => s.name === name)
+  function getRankChange(name: string, currentRank: number): number | 'NEW' | undefined {
+    if (isMultiMonth) return undefined
+    const prev = prevStats.find((s: UsageStat) => s.name === name)
     if (!prev) return 'NEW'
     return prev.rank - currentRank
   }
@@ -163,7 +176,7 @@ async function TierContent({
             />
           ))}
         </div>
-        <Pagination page={page} totalPages={totalPages} tier={tier} view={view} sort={sort} />
+        <Pagination page={page} totalPages={totalPages} tier={tier} view={view} sort={sort} range={range} />
       </>
     )
   }
@@ -176,9 +189,13 @@ async function TierContent({
             <tr className="bg-white/5 text-left">
               <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Rank</th>
               <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Pokemon</th>
-              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Usage %</th>
-              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Raw Count</th>
-              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Change</th>
+              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">
+                {isMultiMonth ? 'Avg Usage %' : 'Usage %'}
+              </th>
+              <th className="py-3 px-4 text-slate-400 text-sm font-semibold">
+                {isMultiMonth ? 'Avg Raw Count' : 'Raw Count'}
+              </th>
+              {!isMultiMonth && <th className="py-3 px-4 text-slate-400 text-sm font-semibold">Change</th>}
             </tr>
           </thead>
           <tbody>
@@ -192,12 +209,13 @@ async function TierContent({
                 rankChange={getRankChange(pokemon.name, pokemon.rank)}
                 view="table"
                 sourceTier={tier}
+                hideChange={isMultiMonth}
               />
             ))}
           </tbody>
         </table>
       </div>
-      <Pagination page={page} totalPages={totalPages} tier={tier} view={view} sort={sort} />
+      <Pagination page={page} totalPages={totalPages} tier={tier} view={view} sort={sort} range={range} />
     </>
   )
 }
@@ -208,6 +226,8 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
   const page = Math.max(1, parseInt(sp.page ?? '1', 10) || 1)
   const view = sp.view === 'card' ? 'card' : 'table'
   const sort = sp.sort === 'raw' ? 'raw' : 'usage'
+  const rangeRaw = parseInt(sp.range ?? '1', 10)
+  const range = [1, 3, 6, 12].includes(rangeRaw) ? rangeRaw : 1
 
   const month = await getLatestMonth()
   const [tiers, minElo] = await Promise.all([
@@ -241,8 +261,10 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
         </div>
         <p className="text-slate-400 max-w-2xl">{description}</p>
         <div className="flex items-center gap-2 mt-2">
-          <span className="text-xs text-slate-500">{month} data</span>
-          {minElo > 0 && (
+          <span className="text-xs text-slate-500">
+            {range > 1 ? `${range}-Month Average` : `${month} data`}
+          </span>
+          {range === 1 && minElo > 0 && (
             <span className="text-xs bg-white/8 text-slate-400 px-2 py-0.5 rounded-full">
               Rating {minElo.toLocaleString()}+
             </span>
@@ -252,23 +274,32 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
 
       <TierSelector tiers={tiers} selectedTier={tier} basePath="/tier" />
 
-      {/* Controls: view toggle + sort */}
+      {/* Controls: view toggle + sort + range */}
       <div className="flex items-center gap-3 mb-6 flex-wrap">
         <div className="flex gap-2">
-          <a href={`/tier/${tier}?page=1&view=table&sort=${sort}`} className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${view === 'table' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
+          <a href={`/tier/${tier}?page=1&view=table&sort=${sort}&range=${range}`} className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${view === 'table' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
             Table View
           </a>
-          <a href={`/tier/${tier}?page=1&view=card&sort=${sort}`} className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${view === 'card' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
+          <a href={`/tier/${tier}?page=1&view=card&sort=${sort}&range=${range}`} className={`px-4 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${view === 'card' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
             Card View
           </a>
         </div>
 
+        <div className="flex gap-2">
+          <span className="text-slate-500 text-sm self-center">Range:</span>
+          {([1, 3, 6, 12] as const).map((r) => (
+            <a key={r} href={`/tier/${tier}?page=1&view=${view}&sort=${sort}&range=${r}`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${range === r ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
+              {r === 1 ? 'Latest' : `${r}M Avg`}
+            </a>
+          ))}
+        </div>
+
         <div className="flex gap-2 ml-auto">
           <span className="text-slate-500 text-sm self-center">Sort:</span>
-          <a href={`/tier/${tier}?page=1&view=${view}&sort=usage`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${sort === 'usage' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
+          <a href={`/tier/${tier}?page=1&view=${view}&sort=usage&range=${range}`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${sort === 'usage' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
             Usage %
           </a>
-          <a href={`/tier/${tier}?page=1&view=${view}&sort=raw`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${sort === 'raw' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
+          <a href={`/tier/${tier}?page=1&view=${view}&sort=raw&range=${range}`} className={`px-3 py-2 rounded-lg text-sm font-medium min-h-[44px] inline-flex items-center transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 ${sort === 'raw' ? 'bg-indigo-600 text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}>
             Raw Count
           </a>
         </div>
@@ -276,7 +307,7 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
 
       <ErrorBoundary>
         <Suspense fallback={<SkeletonTable rows={50} />}>
-          <TierContent tier={tier} page={page} view={view} sort={sort} />
+          <TierContent tier={tier} page={page} view={view} sort={sort} range={range} />
         </Suspense>
       </ErrorBoundary>
     </>

@@ -25,10 +25,11 @@ interface RowProps {
   rankChange: number | 'NEW' | undefined
   view: 'table' | 'card'
   sourceTier?: string
+  hideChange?: boolean
 }
 
 export const PokemonRowClient = memo(function PokemonRowClient({
-  rank, name, usagePercent, rawCount, rankChange, view, sourceTier,
+  rank, name, usagePercent, rawCount, rankChange, view, sourceTier, hideChange,
 }: RowProps): React.JSX.Element {
   const normalized = normalizeSmogonName(name)
   const artworkUrls = getPokemonImageUrls(name)
@@ -78,7 +79,7 @@ export const PokemonRowClient = memo(function PokemonRowClient({
       </td>
       <td className="py-3 px-4 text-indigo-400 font-bold">{usagePercent.toFixed(2)}%</td>
       <td className="py-3 px-4 text-slate-400 text-sm">{rawCount.toLocaleString()}</td>
-      <td className="py-3 px-4"><RankChange change={rankChange} /></td>
+      {!hideChange && <td className="py-3 px-4"><RankChange change={rankChange} /></td>}
     </tr>
   )
 })

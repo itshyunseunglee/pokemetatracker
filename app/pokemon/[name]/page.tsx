@@ -83,9 +83,9 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
   const last6 = allMonths.slice(0, 6).reverse()
   const tiers = await getAvailableTiers(month)
 
-  // Search top 20 tiers in parallel — covers ou/ubers/.../nationaldex/VGC/Champions/BSS
+  // Search all tiers in parallel — results are cached so this is fast
   const tierSearchResults = await Promise.all(
-    tiers.slice(0, 20).map(async (tier) => {
+    tiers.map(async (tier) => {
       try {
         const stats = await getUsageStats(month, tier)
         const entry = stats.find((s) => normalizeSmogonName(s.name) === name)
@@ -121,6 +121,7 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
   const GEN_TO_DEX: Record<number, string> = { 9:'sv', 8:'ss', 7:'sm', 6:'xy', 5:'bw', 4:'dp', 3:'rs', 2:'gs', 1:'rb' }
   const genNum = parseInt(mainTier.match(/^gen(\d)/)?.[1] ?? '9', 10)
   const smogonDex = GEN_TO_DEX[genNum] ?? 'sv'
+  const mainTierUsage = tierUsages.find((tu) => tu.tier === mainTier) ?? tierUsages[0]
 
   if (tierUsages.length === 0 && !movesetData) {
     return (
@@ -147,11 +148,11 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
                 {pokeInfo.types.map((t) => <TypeBadge key={t} type={t} />)}
               </div>
             )}
-            {tierUsages.length > 0 && (
+            {mainTierUsage && (
               <p className="text-slate-400 mb-4">
-                Current usage in <span className="text-indigo-400 font-semibold">{tierUsages[0].tier}</span>:{' '}
-                <span className="text-white font-bold text-xl">{tierUsages[0].usagePercent.toFixed(2)}%</span>
-                {' '}(Rank #{tierUsages[0].rank})
+                Current usage in <span className="text-indigo-400 font-semibold">{mainTierUsage.tier}</span>:{' '}
+                <span className="text-white font-bold text-xl">{mainTierUsage.usagePercent.toFixed(2)}%</span>
+                {' '}(Rank #{mainTierUsage.rank})
                 {minElo > 0 && (
                   <span className="ml-2 text-xs bg-white/8 text-slate-500 px-2 py-0.5 rounded-full align-middle">
                     Rating {minElo.toLocaleString()}+
