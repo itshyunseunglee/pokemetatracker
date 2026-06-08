@@ -49,7 +49,7 @@ export default function SmartPokemonImage({
       onError={() => setIdx((i) => i + 1)}
       priority={priority}
       loading={priority ? 'eager' : loading}
-      unoptimized={src.includes('pokemonshowdown.com')}
+      unoptimized={src.startsWith('https://')}
     />
   )
 }
