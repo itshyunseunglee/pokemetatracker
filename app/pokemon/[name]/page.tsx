@@ -117,6 +117,9 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
   const pokeInfo = pokemonData[name] ?? pokemonData[name.split('-')[0]]
   const imageUrls = getPokemonImageUrls(name)
   const displayName = name.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  const GEN_TO_DEX: Record<number, string> = { 9:'sv', 8:'ss', 7:'sm', 6:'xy', 5:'bw', 4:'dp', 3:'rs', 2:'gs', 1:'rb' }
+  const genNum = parseInt(mainTier.match(/^gen(\d)/)?.[1] ?? '9', 10)
+  const smogonDex = GEN_TO_DEX[genNum] ?? 'sv'
 
   if (tierUsages.length === 0 && !movesetData) {
     return (
@@ -158,7 +161,7 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
             {/* Action buttons */}
             <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
               <a
-                href={`https://www.smogon.com/dex/sv/pokemon/${name}/`}
+                href={`https://www.smogon.com/dex/${smogonDex}/pokemon/${name}/`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[40px]"

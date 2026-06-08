@@ -29,6 +29,7 @@ const FORM_POKEMON_IDS: Record<string, number> = {
   'oricorio-pom-pom': 10123, 'oricorio-pau': 10124, 'oricorio-sensu': 10125,
   'necrozma-ultra': 10157,
   'basculin-white-striped': 10247,
+  'ogerpon-wellspring': 10273, 'ogerpon-hearthflame': 10274, 'ogerpon-cornerstone': 10275,
 }
 
 export function normalizeSmogonName(name: string): string {
