@@ -3,6 +3,34 @@ import type { PokemonDataMap } from '@/types/smogon'
 
 export const pokemonData: PokemonDataMap = pokemonDataRaw as PokemonDataMap
 
+// PokeAPI IDs for competitive form Pokemon not in pokemon-data.json
+// (megas, primals, alternate forms that appear in National Dex / Champions stats)
+const FORM_POKEMON_IDS: Record<string, number> = {
+  'venusaur-mega': 10033, 'charizard-mega-x': 10034, 'charizard-mega-y': 10035,
+  'blastoise-mega': 10036, 'alakazam-mega': 10037, 'gengar-mega': 10038,
+  'kangaskhan-mega': 10039, 'pinsir-mega': 10040, 'gyarados-mega': 10041,
+  'aerodactyl-mega': 10042, 'mewtwo-mega-x': 10043, 'mewtwo-mega-y': 10044,
+  'ampharos-mega': 10045, 'scizor-mega': 10046, 'heracross-mega': 10047,
+  'houndoom-mega': 10048, 'tyranitar-mega': 10049, 'blaziken-mega': 10050,
+  'gardevoir-mega': 10051, 'mawile-mega': 10052, 'aggron-mega': 10053,
+  'medicham-mega': 10054, 'manectric-mega': 10055, 'banette-mega': 10056,
+  'absol-mega': 10057, 'garchomp-mega': 10058, 'lucario-mega': 10059,
+  'abomasnow-mega': 10060, 'latias-mega': 10062, 'latios-mega': 10063,
+  'swampert-mega': 10064, 'sceptile-mega': 10065, 'sableye-mega': 10066,
+  'altaria-mega': 10067, 'gallade-mega': 10068, 'audino-mega': 10069,
+  'sharpedo-mega': 10070, 'slowbro-mega': 10071, 'steelix-mega': 10072,
+  'pidgeot-mega': 10073, 'glalie-mega': 10074, 'diancie-mega': 10075,
+  'metagross-mega': 10076, 'kyogre-primal': 10077, 'groudon-primal': 10078,
+  'rayquaza-mega': 10079, 'camerupt-mega': 10087, 'lopunny-mega': 10088,
+  'salamence-mega': 10089, 'beedrill-mega': 10090,
+  'zacian-crowned': 10188, 'zamazenta-crowned': 10189,
+  'toxtricity-low-key': 10184,
+  'lycanroc-midnight': 10126, 'lycanroc-dusk': 10152,
+  'oricorio-pom-pom': 10123, 'oricorio-pau': 10124, 'oricorio-sensu': 10125,
+  'necrozma-ultra': 10157,
+  'basculin-white-striped': 10247,
+}
+
 export function normalizeSmogonName(name: string): string {
   return name
     .toLowerCase()
@@ -14,8 +42,8 @@ export function normalizeSmogonName(name: string): string {
 export function getPokemonId(name: string): number | null {
   const normalized = normalizeSmogonName(name)
   const entry = pokemonData[normalized]
-  if (!entry) return null
-  return entry.id
+  if (entry) return entry.id
+  return FORM_POKEMON_IDS[normalized] ?? null
 }
 
 export function getOfficialArtworkUrl(id: number): string {
@@ -44,6 +72,11 @@ export function getPokemonImageUrls(name: string): string[] {
   if (id) {
     return [getOfficialArtworkUrl(id), showdownDex, showdownPixel]
   }
+  // Last resort: use base form artwork for uncovered form variants (e.g. ogerpon-wellspring → ogerpon)
+  const baseId = getPokemonId(name.split('-')[0])
+  if (baseId) {
+    return [getOfficialArtworkUrl(baseId), showdownDex, showdownPixel]
+  }
   return [showdownDex, showdownPixel]
 }
 
@@ -57,6 +90,10 @@ export function getPokemonSpriteUrls(name: string): string[] {
     // This prevents a priority-image 404 from firing onError during React hydration,
     // which was causing rank #1 (Great Tusk) to render broken on initial load.
     return [getPixelSpriteUrl(id), showdownDex, showdownPixel]
+  }
+  const baseId = getPokemonId(name.split('-')[0])
+  if (baseId) {
+    return [getPixelSpriteUrl(baseId), showdownDex, showdownPixel]
   }
   return [showdownDex, showdownPixel]
 }

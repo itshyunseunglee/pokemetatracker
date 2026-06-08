@@ -32,6 +32,7 @@ export default function SmartPokemonImage({
         width={Math.max(32, Math.round(width * 0.72))}
         height={Math.max(32, Math.round(height * 0.72))}
         className="opacity-30 object-contain"
+        unoptimized
       />
     )
   }
