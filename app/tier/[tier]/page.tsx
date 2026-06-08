@@ -9,7 +9,7 @@ import SkeletonTable from '@/components/SkeletonTable'
 import { PokemonRowClient } from '@/components/PokemonRowClient'
 import TierSelector from '@/components/TierSelector'
 
-export const revalidate = 86400
+export const dynamic = 'force-dynamic'
 
 interface TierPageProps {
   params: Promise<{ tier: string }>
