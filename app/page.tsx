@@ -173,13 +173,9 @@ export default async function HomePage() {
           <div className="absolute top-0 bottom-0 left-0 w-px bg-gradient-to-b from-transparent via-indigo-500/20 to-transparent" />
         </div>
 
-        {/* Floating Pokemon — outside overflow-hidden card, so no clipping */}
-        <Suspense fallback={null}>
-          <HeroFloatingPokemon />
-        </Suspense>
-
-        {/* Content */}
-        <div className="relative z-10 p-8 md:px-12 md:py-12 lg:px-16 lg:py-14 flex flex-col justify-center min-h-[460px] md:min-h-[500px]">
+        {/* Content — flex row on md+ so Pokemon never overlap text */}
+        <div className="relative z-10 p-8 md:px-12 md:py-12 lg:px-16 lg:py-14 flex flex-col md:flex-row md:items-center justify-center min-h-[460px] md:min-h-[500px]">
+          <div className="flex flex-col justify-center flex-1">
           {/* Live badge */}
           <Suspense fallback={
             <div className="inline-block w-48 h-7 rounded-full bg-white/5 animate-pulse mb-7" />
@@ -245,6 +241,14 @@ export default async function HomePage() {
           }>
             <HeroStats />
           </Suspense>
+        </div>
+
+          {/* Pokemon column — md+ only, flex sibling so it never overlaps text */}
+          <div className="hidden md:flex items-center justify-center flex-shrink-0">
+            <Suspense fallback={null}>
+              <HeroFloatingPokemon />
+            </Suspense>
+          </div>
         </div>
       </section>
 

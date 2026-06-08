@@ -21,7 +21,7 @@ export default async function HeroFloatingPokemon() {
     return (
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-0 right-0 hidden md:block select-none"
+        className="pointer-events-none relative flex-shrink-0 select-none"
         style={{ width: 340, height: 400 }}
       >
         {top5.map((name, i) => {
