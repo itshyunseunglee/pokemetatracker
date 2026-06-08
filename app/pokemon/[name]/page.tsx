@@ -97,6 +97,7 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
   const tierUsages = tierSearchResults
     .filter((r): r is NonNullable<typeof r> => r !== null)
     .map(({ tier, usagePercent, rank }) => ({ tier, usagePercent, rank }))
+    .sort((a, b) => b.usagePercent - a.usagePercent)
 
   // Prefer the tier the user navigated from (hintTier), else use highest-priority match
   const hintMatch = hintTier ? tierSearchResults.find((r) => r?.tier === hintTier) ?? null : null
