@@ -148,7 +148,7 @@ async function PokemonDetail({ name }: { name: string }) {
                 {' '}(Rank #{tierUsages[0].rank})
                 {minElo > 0 && (
                   <span className="ml-2 text-xs bg-white/8 text-slate-500 px-2 py-0.5 rounded-full align-middle">
-                    Elo {minElo.toLocaleString()}+
+                    Rating {minElo.toLocaleString()}+
                   </span>
                 )}
               </p>

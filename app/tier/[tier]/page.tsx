@@ -242,7 +242,7 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
           <span className="text-xs text-slate-500">{month} data</span>
           {minElo > 0 && (
             <span className="text-xs bg-white/8 text-slate-400 px-2 py-0.5 rounded-full">
-              Elo {minElo.toLocaleString()}+
+              Rating {minElo.toLocaleString()}+
             </span>
           )}
         </div>
