@@ -81,18 +81,25 @@ async function PokemonDetail({ name }: { name: string }) {
   const last6 = allMonths.slice(0, 6).reverse()
   const tiers = await getAvailableTiers(month)
 
-  const mainTier = tiers[0] ?? 'gen9ou'
-  const mainStats = await getUsageStats(month, mainTier).catch(() => [])
-  const smogonName = mainStats.find((s) => normalizeSmogonName(s.name) === name)?.name ?? name
+  // Search top 20 tiers in parallel — covers ou/ubers/.../nationaldex/VGC/Champions/BSS
+  const tierSearchResults = await Promise.all(
+    tiers.slice(0, 20).map(async (tier) => {
+      try {
+        const stats = await getUsageStats(month, tier)
+        const entry = stats.find((s) => normalizeSmogonName(s.name) === name)
+        return entry ? { tier, smogonName: entry.name, usagePercent: entry.usagePercent, rank: entry.rank } : null
+      } catch { return null }
+    })
+  )
 
-  const tierUsages: { tier: string; usagePercent: number; rank: number }[] = []
-  for (const tier of tiers.slice(0, 8)) {
-    try {
-      const stats = await getUsageStats(month, tier)
-      const entry = stats.find((s) => normalizeSmogonName(s.name) === name)
-      if (entry) tierUsages.push({ tier, usagePercent: entry.usagePercent, rank: entry.rank })
-    } catch { /* skip */ }
-  }
+  const tierUsages = tierSearchResults
+    .filter((r): r is NonNullable<typeof r> => r !== null)
+    .map(({ tier, usagePercent, rank }) => ({ tier, usagePercent, rank }))
+
+  // Use the highest-priority tier where this Pokemon actually appears
+  const firstMatch = tierSearchResults.find((r) => r !== null)
+  const smogonName = firstMatch?.smogonName ?? name
+  const mainTier = firstMatch?.tier ?? tiers[0] ?? 'gen9ou'
 
   let movesetData = null
   try {
