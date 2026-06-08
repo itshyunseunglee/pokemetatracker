@@ -99,9 +99,11 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
     .map(({ tier, usagePercent, rank }) => ({ tier, usagePercent, rank }))
     .sort((a, b) => b.usagePercent - a.usagePercent)
 
-  // Prefer the tier the user navigated from (hintTier), else use highest-priority match
+  // Prefer hintTier (navigated from), else use highest-usage tier
   const hintMatch = hintTier ? tierSearchResults.find((r) => r?.tier === hintTier) ?? null : null
-  const firstMatch = hintMatch ?? tierSearchResults.find((r) => r !== null)
+  const bestUsageTier = tierUsages[0]?.tier
+  const bestUsageMatch = bestUsageTier ? tierSearchResults.find((r) => r?.tier === bestUsageTier) ?? null : null
+  const firstMatch = hintMatch ?? bestUsageMatch ?? tierSearchResults.find((r) => r !== null)
   const smogonName = firstMatch?.smogonName ?? name
   const mainTier = firstMatch?.tier ?? tiers[0] ?? 'gen9ou'
 
