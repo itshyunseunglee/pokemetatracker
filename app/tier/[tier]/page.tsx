@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { getLatestMonth, getAvailableTiers, getUsageStats, getUsageMinElo, getAvailableMonths, getAveragedUsageStats } from '@/lib/smogon'
+import { getLatestMonth, getAvailableTiers, getUsageStats, getUsageMinElo, getAveragedUsageStats } from '@/lib/smogon'
 import type { UsageStat } from '@/types/smogon'
 import { formatTierName, getTierColor, getTierDescription } from '@/constants/tierColors'
 import ErrorBoundary from '@/components/ErrorBoundary'
@@ -126,8 +126,16 @@ async function TierContent({
 }) {
   const month = await getLatestMonth()
   const isMultiMonth = range > 1
-  const allMonths = isMultiMonth ? await getAvailableMonths() : []
-  const monthsToUse = isMultiMonth ? allMonths.slice(0, range) : [month]
+
+  function recentMonths(n: number): string[] {
+    const [y, m] = month.split('-').map(Number)
+    return Array.from({ length: n }, (_, i) => {
+      const d = new Date(y, m - 1 - i, 1)
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    })
+  }
+
+  const monthsToUse = isMultiMonth ? recentMonths(range) : [month]
 
   const statsPromise: Promise<UsageStat[]> = isMultiMonth
     ? getAveragedUsageStats(monthsToUse, tier).catch(() => [] as UsageStat[])
