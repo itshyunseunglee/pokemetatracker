@@ -18,8 +18,8 @@ const MAIN_SUFFIXES = new Set([
 
 function isMainTier(t: string): boolean {
   const suffix = t.replace(/^gen\d+/, '')
-  // VGC and BSS (Battle Stadium Singles) are official Championship formats
-  return MAIN_SUFFIXES.has(suffix) || suffix.startsWith('vgc') || suffix.startsWith('bss')
+  // VGC, BSS, and Champions are official Championship formats
+  return MAIN_SUFFIXES.has(suffix) || suffix.startsWith('vgc') || suffix.startsWith('bss') || suffix.startsWith('champions')
 }
 
 function hrefFor(t: string, basePath: string, paramName: string): string {
