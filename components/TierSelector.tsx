@@ -18,7 +18,8 @@ const MAIN_SUFFIXES = new Set([
 
 function isMainTier(t: string): boolean {
   const suffix = t.replace(/^gen\d+/, '')
-  return MAIN_SUFFIXES.has(suffix) || suffix.startsWith('vgc')
+  // VGC and BSS (Battle Stadium Singles) are official Championship formats
+  return MAIN_SUFFIXES.has(suffix) || suffix.startsWith('vgc') || suffix.startsWith('bss')
 }
 
 function hrefFor(t: string, basePath: string, paramName: string): string {
@@ -28,6 +29,8 @@ function hrefFor(t: string, basePath: string, paramName: string): string {
 export default function TierSelector({ tiers, selectedTier, basePath, paramName = 'tier' }: Props): React.JSX.Element {
   const [showAllFormats, setShowAllFormats] = useState(false)
   const [showOlderGens, setShowOlderGens] = useState(false)
+  // Tracks when the user explicitly collapses while a niche tier is selected
+  const [userCollapsed, setUserCollapsed] = useState(false)
 
   // Group by generation (single-digit regex to avoid gen9v2doubles → gen=9v2)
   const genMap = new Map<number, string[]>()
@@ -46,16 +49,36 @@ export default function TierSelector({ tiers, selectedTier, basePath, paramName 
 
   // Auto-expand sections when the active tier lives there
   const shouldShowOlderGens = showOlderGens || selectedIsOlderGen
-  const shouldShowAllFormats = showAllFormats || selectedIsNiche
+  // Auto-expand niche formats when a niche tier is active — unless the user explicitly collapsed
+  const shouldShowAllFormats = showAllFormats || (selectedIsNiche && !userCollapsed)
 
   const hasNicheFormats = tiers.some((t) => !isMainTier(t))
   const hasOlderGens = olderGens.length > 0
+
+  function toggleAllFormats() {
+    if (shouldShowAllFormats) {
+      setShowAllFormats(false)
+      // If collapsing while a niche tier is selected, pin that tier in the strip
+      if (selectedIsNiche) setUserCollapsed(true)
+    } else {
+      setShowAllFormats(true)
+      setUserCollapsed(false)
+    }
+  }
 
   function TierRow({ gen }: { gen: number }) {
     const allForGen = genMap.get(gen) ?? []
     const mainTiers = allForGen.filter(isMainTier)
     const nicheTiers = allForGen.filter((t) => !isMainTier(t))
-    const visibleTiers = shouldShowAllFormats ? allForGen : mainTiers
+
+    // When collapsed after explicit user action, pin the selected niche tier in the strip
+    const pinnedNiche =
+      !shouldShowAllFormats && userCollapsed && selectedIsNiche && allForGen.includes(selectedTier)
+        ? [selectedTier]
+        : []
+
+    const visibleTiers = shouldShowAllFormats ? allForGen : [...mainTiers, ...pinnedNiche]
+    const hiddenNicheCount = nicheTiers.length - pinnedNiche.length
 
     if (visibleTiers.length === 0) return null
 
@@ -76,9 +99,9 @@ export default function TierSelector({ tiers, selectedTier, basePath, paramName 
               {formatTierName(t).replace(/^Gen \d+ /, '')}
             </a>
           ))}
-          {!shouldShowAllFormats && nicheTiers.length > 0 && (
+          {!shouldShowAllFormats && hiddenNicheCount > 0 && (
             <span className="text-xs text-slate-600 self-center pl-0.5">
-              +{nicheTiers.length} more
+              +{hiddenNicheCount} more
             </span>
           )}
         </div>
@@ -109,7 +132,7 @@ export default function TierSelector({ tiers, selectedTier, basePath, paramName 
       {/* Niche/unofficial formats — hidden behind toggle */}
       {hasNicheFormats && (
         <button
-          onClick={() => setShowAllFormats((v) => !v)}
+          onClick={toggleAllFormats}
           className="block text-xs text-slate-500 hover:text-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded px-1"
         >
           {shouldShowAllFormats
