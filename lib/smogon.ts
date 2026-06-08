@@ -10,7 +10,6 @@ async function smogonFetch(url: string): Promise<string> {
   const res = await fetch(url, {
     headers: { 'User-Agent': USER_AGENT },
     cache: 'force-cache',
-    next: { revalidate: 86400 },
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`)
   return res.text()
@@ -38,7 +37,6 @@ export async function getLatestMonth(): Promise<string> {
       const res = await fetch(url, {
         headers: { 'User-Agent': USER_AGENT },
         cache: 'force-cache',
-        next: { revalidate: 86400 },
       })
       if (res.ok) return candidate
     } catch {
