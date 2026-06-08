@@ -365,6 +365,21 @@ export async function getMonthlyUsageForPokemon(
   return settled.filter((r): r is MonthlyUsage => r !== null)
 }
 
+export async function getUsageMinElo(month: string, tier: string): Promise<number> {
+  let files: string[] = []
+  try {
+    const html = await smogonFetch(`${BASE_URL}/${month}/`)
+    const regex = /href="([^"]+\.txt)"/g
+    let match: RegExpExecArray | null
+    while ((match = regex.exec(html)) !== null) {
+      if (!match[1].includes('/')) files.push(match[1])
+    }
+  } catch {}
+  const bestFile = files.length > 0 ? getBestRatingFile(files, tier) : `${tier}-1695.txt`
+  const rating = parseInt(bestFile.replace(`${tier}-`, '').replace('.txt', ''), 10)
+  return isNaN(rating) ? 0 : rating
+}
+
 export async function getUsageStats(month: string, tier: string): Promise<UsageStat[]> {
   const cacheKey = `smogon:stats:${month}:${tier}`
   const cached = getCached<UsageStat[]>(cacheKey)

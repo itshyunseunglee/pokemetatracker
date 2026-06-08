@@ -9,6 +9,7 @@ import {
   getMovesetText,
   parseMovesetData,
   getAvailableMonths,
+  getUsageMinElo,
 } from '@/lib/smogon'
 import { normalizeSmogonName, getPokemonImageUrls, pokemonData } from '@/lib/pokemon'
 import TypeBadge from '@/components/TypeBadge'
@@ -101,11 +102,16 @@ async function PokemonDetail({ name }: { name: string }) {
   const smogonName = firstMatch?.smogonName ?? name
   const mainTier = firstMatch?.tier ?? tiers[0] ?? 'gen9ou'
 
-  let movesetData = null
-  try {
-    const rawText = await getMovesetText(month, mainTier)
-    movesetData = parseMovesetData(rawText, smogonName)
-  } catch { /* skip */ }
+  const [movesetResult, minElo] = await Promise.all([
+    (async () => {
+      try {
+        const rawText = await getMovesetText(month, mainTier)
+        return parseMovesetData(rawText, smogonName)
+      } catch { return null }
+    })(),
+    getUsageMinElo(month, mainTier).catch(() => 0),
+  ])
+  const movesetData = movesetResult
   const pokeInfo = pokemonData[name] ?? pokemonData[name.split('-')[0]]
   const imageUrls = getPokemonImageUrls(name)
   const displayName = name.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -140,6 +146,11 @@ async function PokemonDetail({ name }: { name: string }) {
                 Current usage in <span className="text-indigo-400 font-semibold">{tierUsages[0].tier}</span>:{' '}
                 <span className="text-white font-bold text-xl">{tierUsages[0].usagePercent.toFixed(2)}%</span>
                 {' '}(Rank #{tierUsages[0].rank})
+                {minElo > 0 && (
+                  <span className="ml-2 text-xs bg-white/8 text-slate-500 px-2 py-0.5 rounded-full align-middle">
+                    Elo {minElo.toLocaleString()}+
+                  </span>
+                )}
               </p>
             )}
             {/* Action buttons */}

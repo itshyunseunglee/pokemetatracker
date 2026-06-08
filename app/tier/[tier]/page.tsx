@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { getLatestMonth, getAvailableTiers, getUsageStats } from '@/lib/smogon'
+import { getLatestMonth, getAvailableTiers, getUsageStats, getUsageMinElo } from '@/lib/smogon'
 import { formatTierName, getTierColor, getTierDescription } from '@/constants/tierColors'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import SkeletonTable from '@/components/SkeletonTable'
@@ -208,7 +208,10 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
   const sort = sp.sort === 'raw' ? 'raw' : 'usage'
 
   const month = await getLatestMonth()
-  const tiers = await getAvailableTiers(month)
+  const [tiers, minElo] = await Promise.all([
+    getAvailableTiers(month),
+    getUsageMinElo(month, tier).catch(() => 0),
+  ])
   if (tiers.length > 0 && !tiers.includes(tier)) {
     notFound()
   }
@@ -235,6 +238,14 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
           <h1 className="text-3xl font-bold text-white">{displayName}</h1>
         </div>
         <p className="text-slate-400 max-w-2xl">{description}</p>
+        <div className="flex items-center gap-2 mt-2">
+          <span className="text-xs text-slate-500">{month} data</span>
+          {minElo > 0 && (
+            <span className="text-xs bg-white/8 text-slate-400 px-2 py-0.5 rounded-full">
+              Elo {minElo.toLocaleString()}+
+            </span>
+          )}
+        </div>
       </div>
 
       <TierSelector tiers={tiers} selectedTier={tier} basePath="/tier" />
