@@ -144,6 +144,15 @@ export async function getAvailableTiers(month: string): Promise<string[]> {
   }
 }
 
+async function smogonFetchFresh(url: string): Promise<string> {
+  const res = await fetch(url, {
+    headers: { 'User-Agent': USER_AGENT },
+    cache: 'no-store',
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`)
+  return res.text()
+}
+
 export async function getMovesetText(month: string, tier: string): Promise<string> {
   const cacheKey = `smogon:moveset:${month}:${tier}`
   const cached = getCached<string>(cacheKey)
@@ -151,7 +160,7 @@ export async function getMovesetText(month: string, tier: string): Promise<strin
 
   let files: string[] = []
   try {
-    const html = await smogonFetch(`${BASE_URL}/${month}/moveset/`)
+    const html = await smogonFetchFresh(`${BASE_URL}/${month}/moveset/`)
     const regex = /href="([^"]+\.txt)"/g
     let match: RegExpExecArray | null
     while ((match = regex.exec(html)) !== null) {
@@ -161,7 +170,7 @@ export async function getMovesetText(month: string, tier: string): Promise<strin
 
   const bestFile = files.length > 0 ? getBestRatingFile(files, tier) : `${tier}-1695.txt`
   const url = `${BASE_URL}/${month}/moveset/${bestFile}`
-  const text = await smogonFetch(url)
+  const text = await smogonFetchFresh(url)
   setCached(cacheKey, text, TTL_24H)
   return text
 }
