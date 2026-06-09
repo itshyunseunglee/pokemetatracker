@@ -5,12 +5,13 @@ import { normalizeSmogonName } from '@/lib/pokemon'
 const BASE_URL = 'https://pokemetatracker-psi.vercel.app'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date()
   const routes: MetadataRoute.Sitemap = [
-    { url: BASE_URL, lastModified: new Date(), changeFrequency: 'monthly', priority: 1 },
-    { url: `${BASE_URL}/trends`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${BASE_URL}/tier`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${BASE_URL}/moves`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE_URL}/items`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: BASE_URL, lastModified: now, changeFrequency: 'monthly', priority: 1 },
+    { url: `${BASE_URL}/trends`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE_URL}/tier`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE_URL}/moves`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE_URL}/items`, lastModified: now, changeFrequency: 'monthly', priority: 0.8 },
   ]
 
   try {
@@ -20,19 +21,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const tier of tiers) {
       routes.push({
         url: `${BASE_URL}/tier/${tier}`,
-        lastModified: new Date(),
+        lastModified: now,
         changeFrequency: 'monthly',
-        priority: 0.8,
+        priority: tier === 'gen9ou' ? 0.9 : 0.8,
       })
     }
 
-    const mainTier = tiers[0] ?? 'gen9ou'
-    const stats = await getUsageStats(month, mainTier)
-    const top100 = stats.slice(0, 100)
-    for (const pokemon of top100) {
+    // Fetch top Pokemon from multiple tiers for broader coverage
+    const tiersToCover = tiers.slice(0, 8)
+    const pokemonSet = new Set<string>()
+
+    await Promise.all(
+      tiersToCover.map(async (tier) => {
+        try {
+          const stats = await getUsageStats(month, tier)
+          stats.slice(0, 80).forEach((s) => pokemonSet.add(normalizeSmogonName(s.name)))
+        } catch { /* skip */ }
+      })
+    )
+
+    for (const pokemonName of Array.from(pokemonSet)) {
       routes.push({
-        url: `${BASE_URL}/pokemon/${normalizeSmogonName(pokemon.name)}`,
-        lastModified: new Date(),
+        url: `${BASE_URL}/pokemon/${pokemonName}`,
+        lastModified: now,
         changeFrequency: 'monthly',
         priority: 0.7,
       })

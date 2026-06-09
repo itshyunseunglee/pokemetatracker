@@ -10,12 +10,12 @@ import TierSelector from '@/components/TierSelector'
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Move Trends - Pokemon Showdown Usage | PokeMetaTracker',
-  description: 'Top move usage rankings in competitive Pokemon Showdown, filtered by tier.',
+  title: 'Move Usage Rankings — Pokemon Showdown Competitive Stats | PokeMetaTracker',
+  description: 'Most-used moves in competitive Pokemon Showdown by tier. Aggregate move rankings across all top Pokemon in OU, UU, Ubers, and more. Updated monthly from Smogon stats.',
   alternates: { canonical: 'https://pokemetatracker-psi.vercel.app/moves' },
   openGraph: {
-    title: 'Move Trends - Pokemon Showdown Usage | PokeMetaTracker',
-    description: 'Top move usage rankings in competitive Pokemon Showdown, filtered by tier.',
+    title: 'Move Usage Rankings — Pokemon Showdown Competitive Stats | PokeMetaTracker',
+    description: 'Most-used moves in competitive Pokemon Showdown by tier. Aggregate move rankings across all top Pokemon in OU, UU, Ubers, and more. Updated monthly from Smogon stats.',
     url: 'https://pokemetatracker-psi.vercel.app/moves',
     images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },

@@ -13,14 +13,14 @@ import MonthlyHighlights from '@/components/MonthlyHighlights'
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',
+  title: 'PokeMetaTracker — Smogon Pokemon Showdown Usage Stats & Tier Rankings',
   description:
-    'Track Pokemon Showdown competitive meta trends, usage stats, movesets, and tier rankings updated monthly from Smogon data.',
+    'Competitive Pokemon Showdown usage stats updated monthly from Smogon. Browse OU, UU, Ubers, and 60+ tier rankings, movesets, item trends, and meta history for Gens 1–9.',
   alternates: { canonical: 'https://pokemetatracker-psi.vercel.app' },
   openGraph: {
-    title: 'PokeMetaTracker - Pokemon Showdown Meta Statistics & Trends',
+    title: 'PokeMetaTracker — Smogon Pokemon Showdown Usage Stats & Tier Rankings',
     description:
-      'Track Pokemon Showdown competitive meta trends, usage stats, movesets, and tier rankings updated monthly from Smogon data.',
+      'Competitive Pokemon Showdown usage stats updated monthly from Smogon. Browse OU, UU, Ubers, and 60+ tier rankings, movesets, item trends, and meta history for Gens 1–9.',
     url: 'https://pokemetatracker-psi.vercel.app',
     images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },

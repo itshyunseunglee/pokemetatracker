@@ -32,14 +32,15 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: TierPageProps): Promise<Metadata> {
   const { tier } = await params
   const displayName = formatTierName(tier)
+  const month = await getLatestMonth()
   const url = `https://pokemetatracker-psi.vercel.app/tier/${tier}`
   return {
-    title: `${displayName} Tier Pokemon Usage Rankings | PokeMetaTracker`,
-    description: `Full ${displayName} tier usage rankings from Smogon competitive Pokemon Showdown statistics.`,
+    title: `${displayName} Usage Rankings ${month} — Pokemon Showdown | PokeMetaTracker`,
+    description: `${displayName} tier Pokemon usage rankings for ${month}. Full Smogon stats: usage %, raw count, rank changes for every Pokemon in competitive Pokemon Showdown.`,
     alternates: { canonical: url },
     openGraph: {
-      title: `${displayName} Tier Pokemon Usage Rankings | PokeMetaTracker`,
-      description: `Full ${displayName} tier usage rankings from Smogon competitive Pokemon Showdown statistics.`,
+      title: `${displayName} Usage Rankings ${month} — Pokemon Showdown | PokeMetaTracker`,
+      description: `${displayName} tier Pokemon usage rankings for ${month}. Full Smogon stats: usage %, raw count, rank changes for every Pokemon in competitive Pokemon Showdown.`,
       url,
       images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
     },
@@ -219,13 +220,24 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
   const color = getTierColor(tier)
   const description = getTierDescription(tier)
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: `${displayName} Pokemon Usage Rankings`,
-    description,
-    url: `https://pokemetatracker-psi.vercel.app/tier/${tier}`,
-  }
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: `${displayName} Pokemon Usage Rankings`,
+      description,
+      url: `https://pokemetatracker-psi.vercel.app/tier/${tier}`,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pokemetatracker-psi.vercel.app' },
+        { '@type': 'ListItem', position: 2, name: 'Tier Rankings', item: 'https://pokemetatracker-psi.vercel.app/tier' },
+        { '@type': 'ListItem', position: 3, name: displayName, item: `https://pokemetatracker-psi.vercel.app/tier/${tier}` },
+      ],
+    },
+  ]
 
   return (
     <>

@@ -9,12 +9,12 @@ import ItemImage from '@/components/ItemImage'
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Item Trends - Pokemon Showdown Usage | PokeMetaTracker',
-  description: 'Top held item usage rankings in competitive Pokemon Showdown, filtered by tier.',
+  title: 'Item Usage Rankings — Pokemon Showdown Competitive Stats | PokeMetaTracker',
+  description: 'Most-used held items in competitive Pokemon Showdown by tier. Aggregate item rankings weighted by Pokemon usage in OU, UU, Ubers, and more. Updated monthly from Smogon stats.',
   alternates: { canonical: 'https://pokemetatracker-psi.vercel.app/items' },
   openGraph: {
-    title: 'Item Trends - Pokemon Showdown Usage | PokeMetaTracker',
-    description: 'Top held item usage rankings in competitive Pokemon Showdown, filtered by tier.',
+    title: 'Item Usage Rankings — Pokemon Showdown Competitive Stats | PokeMetaTracker',
+    description: 'Most-used held items in competitive Pokemon Showdown by tier. Aggregate item rankings weighted by Pokemon usage in OU, UU, Ubers, and more. Updated monthly from Smogon stats.',
     url: 'https://pokemetatracker-psi.vercel.app/items',
     images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },

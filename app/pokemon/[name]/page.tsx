@@ -43,12 +43,12 @@ export async function generateMetadata({ params }: PokemonPageProps): Promise<Me
   const displayName = name.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
   const url = `https://pokemetatracker-psi.vercel.app/pokemon/${name}`
   return {
-    title: `${displayName} Usage Stats, Movesets & Counters | PokeMetaTracker`,
-    description: `${displayName} usage rate, top movesets, best items, teammates, and counters in Pokemon Showdown competitive play.`,
+    title: `${displayName} Competitive Stats — Moveset, Items & Counters | PokeMetaTracker`,
+    description: `${displayName} Smogon usage stats: best moveset, held items, EV spreads, teammates, and checks & counters in competitive Pokemon Showdown. Updated monthly.`,
     alternates: { canonical: url },
     openGraph: {
-      title: `${displayName} Usage Stats, Movesets & Counters | PokeMetaTracker`,
-      description: `${displayName} usage rate, top movesets, best items, teammates, and counters in Pokemon Showdown competitive play.`,
+      title: `${displayName} Competitive Stats — Moveset, Items & Counters | PokeMetaTracker`,
+      description: `${displayName} Smogon usage stats: best moveset, held items, EV spreads, teammates, and checks & counters in competitive Pokemon Showdown. Updated monthly.`,
       url,
       images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
     },
@@ -339,21 +339,34 @@ export default async function PokemonPage({ params, searchParams }: PokemonPageP
   const { tier: hintTier } = await searchParams
   if (name !== name.toLowerCase()) notFound()
 
+  const displayName = name.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://pokemetatracker-psi.vercel.app' },
+      { '@type': 'ListItem', position: 2, name: displayName, item: `https://pokemetatracker-psi.vercel.app/pokemon/${name}` },
+    ],
+  }
+
   return (
-    <ErrorBoundary>
-      <Suspense
-        fallback={
-          <div className="space-y-6 animate-pulse">
-            <div className="h-48 rounded-xl bg-white/5" />
-            <div className="grid lg:grid-cols-2 gap-6">
-              <div className="h-64 rounded-xl bg-white/5" />
-              <div className="h-64 rounded-xl bg-white/5" />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <ErrorBoundary>
+        <Suspense
+          fallback={
+            <div className="space-y-6 animate-pulse">
+              <div className="h-48 rounded-xl bg-white/5" />
+              <div className="grid lg:grid-cols-2 gap-6">
+                <div className="h-64 rounded-xl bg-white/5" />
+                <div className="h-64 rounded-xl bg-white/5" />
+              </div>
             </div>
-          </div>
-        }
-      >
-        <PokemonDetail name={name.toLowerCase()} hintTier={hintTier} />
-      </Suspense>
-    </ErrorBoundary>
+          }
+        >
+          <PokemonDetail name={name.toLowerCase()} hintTier={hintTier} />
+        </Suspense>
+      </ErrorBoundary>
+    </>
   )
 }

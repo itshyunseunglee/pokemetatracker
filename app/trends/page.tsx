@@ -26,12 +26,12 @@ const SearchTrendClient = dynamic(() => import('./SearchTrendClient'), {
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Pokemon Showdown Meta Trends | PokeMetaTracker',
-  description: 'View usage trends for Pokemon in competitive Pokemon Showdown over the past 6 months.',
+  title: 'Pokemon Usage Trends — Competitive Meta History | PokeMetaTracker',
+  description: 'Track Pokemon usage trend changes over time in competitive Pokemon Showdown. View 6-month usage history by tier — OU, UU, Ubers, and more. Based on Smogon monthly stats.',
   alternates: { canonical: 'https://pokemetatracker-psi.vercel.app/trends' },
   openGraph: {
-    title: 'Pokemon Showdown Meta Trends | PokeMetaTracker',
-    description: 'View usage trends for Pokemon in competitive Pokemon Showdown over the past 6 months.',
+    title: 'Pokemon Usage Trends — Competitive Meta History | PokeMetaTracker',
+    description: 'Track Pokemon usage trend changes over time in competitive Pokemon Showdown. View 6-month usage history by tier — OU, UU, Ubers, and more. Based on Smogon monthly stats.',
     url: 'https://pokemetatracker-psi.vercel.app/trends',
     images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
   },
