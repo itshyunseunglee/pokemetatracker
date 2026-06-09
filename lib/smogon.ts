@@ -89,7 +89,12 @@ export function getBestRatingFile(files: string[], tierBaseName: string): string
     const ratingB = parseInt(b.replace(tierBaseName + '-', '').replace('.txt', ''), 10)
     return ratingB - ratingA
   })
-  return matching[0]
+  // Cap at 1760 so ultra-high-rating files (1825+) with small sample sizes are avoided
+  const capped = matching.find((f) => {
+    const rating = parseInt(f.replace(tierBaseName + '-', '').replace('.txt', ''), 10)
+    return rating <= 1760
+  })
+  return capped ?? matching[0]
 }
 
 export async function getAvailableTiers(month: string): Promise<string[]> {
