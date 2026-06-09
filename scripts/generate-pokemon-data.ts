@@ -74,6 +74,8 @@ async function main(): Promise<void> {
     'rotom-wash', 'rotom-heat', 'rotom-mow', 'rotom-frost', 'rotom-fan',
     'giratina-origin', 'shaymin-sky', 'deoxys-speed', 'deoxys-attack', 'deoxys-defense',
     'slowking-galar', 'weezing-galar', 'articuno-galar', 'zapdos-galar', 'moltres-galar',
+    'slowbro-galar', 'slowpoke-galar', 'corsola-galar', 'yamask-galar',
+    'ponyta-galar', 'rapidash-galar', 'linoone-galar', 'stunfisk-galar',
     'urshifu-rapid-strike', 'calyrex-shadow', 'calyrex-ice',
     'enamorus-therian',
     'ogerpon-wellspring', 'ogerpon-hearthflame', 'ogerpon-cornerstone',
@@ -81,8 +83,42 @@ async function main(): Promise<void> {
     'samurott-hisui', 'typhlosion-hisui', 'decidueye-hisui',
     'lilligant-hisui', 'arcanine-hisui', 'electrode-hisui',
     'avalugg-hisui', 'goodra-hisui', 'braviary-hisui',
+    'zoroark-hisui', 'zorua-hisui', 'qwilfish-hisui', 'sneasel-hisui',
     'ursaluna-bloodmoon',
+    // Alolan forms
+    'ninetales-alola', 'vulpix-alola',
+    'sandshrew-alola', 'sandslash-alola',
+    'raichu-alola',
+    'meowth-alola', 'persian-alola',
+    'geodude-alola', 'graveler-alola', 'golem-alola',
+    'grimer-alola', 'muk-alola',
+    'exeggutor-alola',
+    'marowak-alola',
+    'dugtrio-alola',
+    'diglett-alola',
+    'raticate-alola', 'rattata-alola',
   ]
+
+  // Smogon usage names that differ from PokeAPI form names — create aliases so
+  // /pokemon/aegislash works even though pokemonData stores "aegislash-shield".
+  const SMOGON_ALIASES: Record<string, string> = {
+    'aegislash': 'aegislash-shield',
+    'darmanitan': 'darmanitan-standard',
+    'giratina': 'giratina-altered',
+    'shaymin': 'shaymin-land',
+    'keldeo': 'keldeo-ordinary',
+    'tornadus': 'tornadus-incarnate',
+    'thundurus': 'thundurus-incarnate',
+    'landorus': 'landorus-incarnate',
+    'enamorus': 'enamorus-incarnate',
+    'basculegion': 'basculegion-male',
+    'indeedee': 'indeedee-male',
+    'meowstic': 'meowstic-male',
+    'oinkologne': 'oinkologne-male',
+    'frillish': 'frillish-male',
+    'jellicent': 'jellicent-male',
+    'pyroar': 'pyroar-male',
+  }
 
   const baseSubset = list.results.slice(0, TOP_LIMIT)
   // Merge base with extra forms (deduplicate)
@@ -125,6 +161,13 @@ async function main(): Promise<void> {
       }
     } catch (err) {
       console.error(`Failed to fetch ${item.name}:`, err)
+    }
+  }
+
+  // Apply aliases: if Smogon uses bare name but PokeAPI stores a form suffix
+  for (const [alias, target] of Object.entries(SMOGON_ALIASES)) {
+    if (!result[alias] && result[target]) {
+      result[alias] = result[target]
     }
   }
 
