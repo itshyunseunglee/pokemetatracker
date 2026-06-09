@@ -21,7 +21,7 @@ export async function GET() {
     while ((match = regex.exec(dirHtml)) !== null) {
       if (!match[1].includes('/')) files.push(match[1])
     }
-    const uniqueFiles = [...new Set(files)]
+    const uniqueFiles = Array.from(new Set(files))
     const bestFile = uniqueFiles.length > 0 ? getBestRatingFile(uniqueFiles, 'gen9ou') : 'gen9ou-1695.txt'
     const fileUrl = `${BASE_URL}/${month}/moveset/${bestFile}`
 
