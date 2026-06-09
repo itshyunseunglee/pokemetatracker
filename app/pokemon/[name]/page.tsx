@@ -101,11 +101,12 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
   // Only show tiers with meaningful usage; always include at least the top tier
   const tierUsages = allTierUsages.filter((tu, i) => tu.usagePercent >= 0.05 || i === 0)
 
-  // Prefer hintTier (navigated from), else use highest-usage tier
+  // Prefer hintTier (navigated from), else use the first standard tier by priority order.
+  // Do NOT sort by usage: niche formats (e.g. gen9godlygift) can have 100% usage but are
+  // wrong for moveset lookup; tiers[] is already priority-ordered (gen9ou first).
   const hintMatch = hintTier ? tierSearchResults.find((r) => r?.tier === hintTier) ?? null : null
-  const bestUsageTier = tierUsages[0]?.tier
-  const bestUsageMatch = bestUsageTier ? tierSearchResults.find((r) => r?.tier === bestUsageTier) ?? null : null
-  const firstMatch = hintMatch ?? bestUsageMatch ?? tierSearchResults.find((r) => r !== null)
+  const priorityMatch = tierSearchResults.find((r) => r !== null)
+  const firstMatch = hintMatch ?? priorityMatch ?? null
   const smogonName = firstMatch?.smogonName ?? name
   const mainTier = firstMatch?.tier ?? tiers[0] ?? 'gen9ou'
 
