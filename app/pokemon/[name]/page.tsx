@@ -128,6 +128,7 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
   const mainTierUsage = tierUsages.find((tu) => tu.tier === mainTier) ?? tierUsages[0]
 
   if (tierUsages.length === 0 && !movesetData) {
+    if (!pokeInfo) notFound()
     return (
       <div className="rounded-xl border border-yellow-900/40 bg-yellow-950/20 p-8 text-center">
         <p className="text-yellow-400 font-medium">No competitive data available for this Pokemon.</p>
