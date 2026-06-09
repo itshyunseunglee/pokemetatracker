@@ -32,6 +32,8 @@ interface ItemEntry {
   name: string
   totalPercent: number
   count: number
+  topPokemon: string
+  topPokemonWeight: number
 }
 
 async function ItemsContent({ tier }: { tier: string }) {
@@ -60,12 +62,17 @@ async function ItemsContent({ tier }: { tier: string }) {
       for (const item of movesetData.items) {
         const itemName = item.name.trim()
         if (!itemName || itemName === 'Nothing' || itemName === 'Other') continue
+        const contribution = item.percent * weight
         const existing = itemMap.get(itemName)
         if (existing) {
-          existing.totalPercent += item.percent * weight
+          existing.totalPercent += contribution
           existing.count++
+          if (contribution > existing.topPokemonWeight) {
+            existing.topPokemon = pokemon.name
+            existing.topPokemonWeight = contribution
+          }
         } else {
-          itemMap.set(itemName, { name: itemName, totalPercent: item.percent * weight, count: 1 })
+          itemMap.set(itemName, { name: itemName, totalPercent: contribution, count: 1, topPokemon: pokemon.name, topPokemonWeight: contribution })
         }
       }
     } catch { /* skip */ }
@@ -122,9 +129,14 @@ async function ItemsContent({ tier }: { tier: string }) {
               <tr key={item.name} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                 <td className="py-2.5 px-4 text-slate-400 font-mono text-sm">{i + 1}</td>
                 <td className="py-2.5 px-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <ItemImage name={item.name} size={24} />
                     <span className="text-slate-100 font-medium">{item.name}</span>
+                    {item.count === 1 && (
+                      <span className="text-xs text-slate-500 bg-white/5 px-1.5 py-0.5 rounded">
+                        {item.topPokemon} only
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="py-2.5 px-4 text-amber-400 font-semibold">{item.totalPercent.toFixed(2)}%</td>
