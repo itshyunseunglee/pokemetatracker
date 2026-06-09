@@ -58,6 +58,11 @@ function getPrevMonth(yyyyMm: string): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
 }
 
+function formatMonth(yyyyMm: string): string {
+  const [y, m] = yyyyMm.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleString('en-US', { month: 'short', year: 'numeric' })
+}
+
 function Pagination({
   page,
   totalPages,
@@ -233,7 +238,7 @@ export default async function TierPage({ params, searchParams }: TierPageProps) 
         </div>
         <p className="text-slate-400 max-w-2xl">{description}</p>
         <div className="flex items-center gap-2 mt-2">
-          <span className="text-xs text-slate-500">{month} data</span>
+          <span className="text-xs text-slate-500">{formatMonth(getPrevMonth(month))} – {formatMonth(month)}</span>
           {minElo > 0 && (
             <span className="text-xs bg-white/8 text-slate-400 px-2 py-0.5 rounded-full">
               Rating {minElo.toLocaleString()}+
