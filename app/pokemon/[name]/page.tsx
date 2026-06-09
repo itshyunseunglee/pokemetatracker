@@ -340,6 +340,10 @@ export default async function PokemonPage({ params, searchParams }: PokemonPageP
   const { tier: hintTier } = await searchParams
   if (name !== name.toLowerCase()) notFound()
 
+  // 404 for names that don't match any known Pokemon
+  const namePokeInfo = pokemonData[name] ?? pokemonData[name.split('-')[0]]
+  if (!namePokeInfo) notFound()
+
   const displayName = name.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
   const breadcrumbLd = {
     '@context': 'https://schema.org',
