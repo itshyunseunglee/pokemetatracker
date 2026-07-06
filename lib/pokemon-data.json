@@ -15348,6 +15348,51 @@
       "spe": 46
     }
   },
+  "ogerpon-wellspring-mask": {
+    "id": 10273,
+    "types": [
+      "grass",
+      "water"
+    ],
+    "stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 84,
+      "spa": 60,
+      "spd": 96,
+      "spe": 110
+    }
+  },
+  "ogerpon-hearthflame-mask": {
+    "id": 10274,
+    "types": [
+      "grass",
+      "fire"
+    ],
+    "stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 84,
+      "spa": 60,
+      "spd": 96,
+      "spe": 110
+    }
+  },
+  "ogerpon-cornerstone-mask": {
+    "id": 10275,
+    "types": [
+      "grass",
+      "rock"
+    ],
+    "stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 84,
+      "spa": 60,
+      "spd": 96,
+      "spe": 110
+    }
+  },
   "terapagos-stellar": {
     "id": 10277,
     "types": [
@@ -16086,6 +16131,80 @@
       "spa": 109,
       "spd": 66,
       "spe": 106
+    }
+  },
+  "palafin": {
+    "id": 964,
+    "types": [
+      "water"
+    ],
+    "stats": {
+      "hp": 100,
+      "atk": 70,
+      "def": 72,
+      "spa": 53,
+      "spd": 62,
+      "spe": 100
+    }
+  },
+  "minior": {
+    "id": 774,
+    "types": [
+      "rock",
+      "flying"
+    ],
+    "stats": {
+      "hp": 60,
+      "atk": 60,
+      "def": 100,
+      "spa": 60,
+      "spd": 100,
+      "spe": 60
+    }
+  },
+  "ogerpon-wellspring": {
+    "id": 10273,
+    "types": [
+      "grass",
+      "water"
+    ],
+    "stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 84,
+      "spa": 60,
+      "spd": 96,
+      "spe": 110
+    }
+  },
+  "ogerpon-hearthflame": {
+    "id": 10274,
+    "types": [
+      "grass",
+      "fire"
+    ],
+    "stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 84,
+      "spa": 60,
+      "spd": 96,
+      "spe": 110
+    }
+  },
+  "ogerpon-cornerstone": {
+    "id": 10275,
+    "types": [
+      "grass",
+      "rock"
+    ],
+    "stats": {
+      "hp": 80,
+      "atk": 120,
+      "def": 84,
+      "spa": 60,
+      "spd": 96,
+      "spe": 110
     }
   }
 }

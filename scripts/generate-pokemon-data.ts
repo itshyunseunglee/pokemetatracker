@@ -78,7 +78,7 @@ async function main(): Promise<void> {
     'ponyta-galar', 'rapidash-galar', 'linoone-galar', 'stunfisk-galar',
     'urshifu-rapid-strike', 'calyrex-shadow', 'calyrex-ice',
     'enamorus-therian',
-    'ogerpon-wellspring', 'ogerpon-hearthflame', 'ogerpon-cornerstone',
+    'ogerpon-wellspring-mask', 'ogerpon-hearthflame-mask', 'ogerpon-cornerstone-mask',
     'terapagos-stellar', 'terapagos-terastal',
     'samurott-hisui', 'typhlosion-hisui', 'decidueye-hisui',
     'lilligant-hisui', 'arcanine-hisui', 'electrode-hisui',
@@ -118,6 +118,11 @@ async function main(): Promise<void> {
     'frillish': 'frillish-male',
     'jellicent': 'jellicent-male',
     'pyroar': 'pyroar-male',
+    'palafin': 'palafin-zero',
+    'minior': 'minior-red-meteor',
+    'ogerpon-wellspring': 'ogerpon-wellspring-mask',
+    'ogerpon-hearthflame': 'ogerpon-hearthflame-mask',
+    'ogerpon-cornerstone': 'ogerpon-cornerstone-mask',
   }
 
   const baseSubset = list.results.slice(0, TOP_LIMIT)
