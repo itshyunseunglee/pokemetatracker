@@ -1,9 +1,8 @@
-import { getCached, setCached } from './cache'
+import { unstable_cache } from 'next/cache'
 import type { UsageStat, MovesetData, MonthlyUsage } from '@/types/smogon'
 
 const BASE_URL = 'https://www.smogon.com/stats'
 const USER_AGENT = 'PokeMetaTracker/1.0'
-const TTL_24H = 24 * 60 * 60 * 1000
 const DEFAULT_TIERS = ['gen9ou', 'gen9uu', 'gen9ubers', 'gen9ru', 'gen9nu', 'gen9pu']
 
 async function smogonFetch(url: string): Promise<string> {
@@ -57,11 +56,7 @@ function recentMonthsFallback(count: number): string[] {
   return months
 }
 
-export async function getAvailableMonths(): Promise<string[]> {
-  const cacheKey = 'smogon:available-months'
-  const cached = getCached<string[]>(cacheKey)
-  if (cached) return cached
-
+async function fetchAvailableMonths(): Promise<string[]> {
   try {
     const html = await smogonFetch(`${BASE_URL}/`)
     const months: string[] = []
@@ -72,14 +67,16 @@ export async function getAvailableMonths(): Promise<string[]> {
       months.push(match[1])
     }
     months.sort((a, b) => b.localeCompare(a))
-    const result = months.length > 0 ? months : recentMonthsFallback(12)
-    if (result.length > 0) setCached(cacheKey, result, TTL_24H)
-    return result
+    return months.length > 0 ? months : recentMonthsFallback(12)
   } catch (err) {
     console.error('[smogon] getAvailableMonths failed:', err)
     return recentMonthsFallback(12)
   }
 }
+
+export const getAvailableMonths = unstable_cache(fetchAvailableMonths, ['smogon-available-months'], {
+  revalidate: 86400,
+})
 
 export function getBestRatingFile(files: string[], tierBaseName: string): string {
   const matching = files.filter((f) => f.startsWith(tierBaseName + '-') && f.endsWith('.txt'))
@@ -97,11 +94,7 @@ export function getBestRatingFile(files: string[], tierBaseName: string): string
   return capped ?? matching[0]
 }
 
-export async function getAvailableTiers(month: string): Promise<string[]> {
-  const cacheKey = `smogon:tiers:${month}`
-  const cached = getCached<string[]>(cacheKey)
-  if (cached) return cached
-
+async function fetchAvailableTiers(month: string): Promise<string[]> {
   try {
     const html = await smogonFetch(`${BASE_URL}/${month}/`)
     const files: string[] = []
@@ -141,7 +134,6 @@ export async function getAvailableTiers(month: string): Promise<string[]> {
       const nameB = b.replace(/^gen\d+/, '')
       return getTierSortKey(nameA).localeCompare(getTierSortKey(nameB))
     })
-    setCached(cacheKey, tiers, TTL_24H)
     return tiers
   } catch (err) {
     console.error('[smogon] getAvailableTiers failed:', err)
@@ -149,11 +141,11 @@ export async function getAvailableTiers(month: string): Promise<string[]> {
   }
 }
 
-export async function getMovesetText(month: string, tier: string): Promise<string> {
-  const cacheKey = `smogon:moveset:${month}:${tier}`
-  const cached = getCached<string>(cacheKey)
-  if (cached) return cached
+export const getAvailableTiers = unstable_cache(fetchAvailableTiers, ['smogon-tiers'], {
+  revalidate: 86400,
+})
 
+async function fetchMovesetText(month: string, tier: string): Promise<string> {
   let files: string[] = []
   try {
     const html = await smogonFetch(`${BASE_URL}/${month}/moveset/`)
@@ -166,16 +158,14 @@ export async function getMovesetText(month: string, tier: string): Promise<strin
 
   const bestFile = files.length > 0 ? getBestRatingFile(files, tier) : `${tier}-1695.txt`
   const url = `${BASE_URL}/${month}/moveset/${bestFile}`
-  const text = await smogonFetch(url)
-  setCached(cacheKey, text, TTL_24H)
-  return text
+  return smogonFetch(url)
 }
 
-export async function getRawUsageText(month: string, tier: string): Promise<string> {
-  const cacheKey = `smogon:raw:${month}:${tier}`
-  const cached = getCached<string>(cacheKey)
-  if (cached) return cached
+export const getMovesetText = unstable_cache(fetchMovesetText, ['smogon-moveset'], {
+  revalidate: 86400,
+})
 
+async function fetchRawUsageText(month: string, tier: string): Promise<string> {
   // Get directory listing to find the best rating file
   let files: string[] = []
   try {
@@ -191,10 +181,12 @@ export async function getRawUsageText(month: string, tier: string): Promise<stri
 
   const bestFile = files.length > 0 ? getBestRatingFile(files, tier) : `${tier}-1695.txt`
   const url = `${BASE_URL}/${month}/${bestFile}`
-  const text = await smogonFetch(url)
-  setCached(cacheKey, text, TTL_24H)
-  return text
+  return smogonFetch(url)
 }
+
+export const getRawUsageText = unstable_cache(fetchRawUsageText, ['smogon-raw'], {
+  revalidate: 86400,
+})
 
 export function parseUsageStats(text: string): UsageStat[] {
   try {
@@ -358,8 +350,7 @@ export async function getMonthlyUsageForPokemon(
   const settled = await Promise.all(
     months.map(async (month): Promise<MonthlyUsage | null> => {
       try {
-        const text = await getRawUsageText(month, tier)
-        const stats = parseUsageStats(text)
+        const stats = await getUsageStats(month, tier)
         const entry = stats.find((s) => s.name.toLowerCase() === pokemon.toLowerCase())
         return entry != null ? { month, usagePercent: entry.usagePercent } : null
       } catch {
@@ -370,7 +361,7 @@ export async function getMonthlyUsageForPokemon(
   return settled.filter((r): r is MonthlyUsage => r !== null)
 }
 
-export async function getUsageMinElo(month: string, tier: string): Promise<number> {
+async function fetchUsageMinElo(month: string, tier: string): Promise<number> {
   let files: string[] = []
   try {
     const html = await smogonFetch(`${BASE_URL}/${month}/`)
@@ -385,21 +376,23 @@ export async function getUsageMinElo(month: string, tier: string): Promise<numbe
   return isNaN(rating) ? 0 : rating
 }
 
-export async function getUsageStats(month: string, tier: string): Promise<UsageStat[]> {
-  const cacheKey = `smogon:stats:${month}:${tier}`
-  const cached = getCached<UsageStat[]>(cacheKey)
-  if (cached) return cached
+export const getUsageMinElo = unstable_cache(fetchUsageMinElo, ['smogon-usage-min-elo'], {
+  revalidate: 86400,
+})
 
+async function fetchUsageStats(month: string, tier: string): Promise<UsageStat[]> {
   try {
     const text = await getRawUsageText(month, tier)
-    const stats = parseUsageStats(text)
-    setCached(cacheKey, stats, TTL_24H)
-    return stats
+    return parseUsageStats(text)
   } catch (err) {
     console.error(`[smogon] getUsageStats failed for ${month}/${tier}:`, err)
     return []
   }
 }
+
+export const getUsageStats = unstable_cache(fetchUsageStats, ['smogon-usage-stats'], {
+  revalidate: 86400,
+})
 
 export async function getAveragedUsageStats(months: string[], tier: string): Promise<UsageStat[]> {
   if (months.length === 1) return getUsageStats(months[0], tier)
