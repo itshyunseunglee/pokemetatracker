@@ -9,7 +9,7 @@ import SkeletonTable from '@/components/SkeletonTable'
 import { PokemonRowClient } from '@/components/PokemonRowClient'
 import TierSelector from '@/components/TierSelector'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 86400
 
 interface TierPageProps {
   params: Promise<{ tier: string }>
@@ -158,7 +158,6 @@ async function TierContent({
               rawCount={pokemon.rawCount}
               rankChange={getRankChange(pokemon.name, pokemon.rank)}
               view="card"
-              sourceTier={tier}
             />
           ))}
         </div>
@@ -190,7 +189,6 @@ async function TierContent({
                 rawCount={pokemon.rawCount}
                 rankChange={getRankChange(pokemon.name, pokemon.rank)}
                 view="table"
-                sourceTier={tier}
               />
             ))}
           </tbody>

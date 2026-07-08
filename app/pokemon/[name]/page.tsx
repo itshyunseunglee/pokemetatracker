@@ -23,19 +23,26 @@ export const revalidate = 86400
 
 interface PokemonPageProps {
   params: Promise<{ name: string }>
-  searchParams: Promise<{ tier?: string }>
 }
 
 export async function generateStaticParams() {
+  // Pre-render the entire Pokedex, not just top-usage mons — pages outside a
+  // small "top N" list were falling through to per-request dynamic rendering,
+  // which is what let a crawler walking the full dex alphabetically burn CPU.
+  // Union with live Smogon usage names too, since those can carry suffixes
+  // (e.g. Tera-active Ogerpon formes) that don't exist as PokeAPI dex entries.
+  const names = new Set(Object.keys(pokemonData))
   try {
     const month = await getLatestMonth()
     const tiers = await getAvailableTiers(month)
-    const mainTier = tiers[0] ?? 'gen9ou'
-    const stats = await getUsageStats(month, mainTier)
-    return stats.slice(0, 100).map((s) => ({ name: normalizeSmogonName(s.name) }))
+    const tierStats = await Promise.all(tiers.map((t) => getUsageStats(month, t).catch(() => [])))
+    for (const stats of tierStats) {
+      for (const s of stats) names.add(normalizeSmogonName(s.name))
+    }
   } catch {
-    return []
+    // fall back to Pokedex-only coverage
   }
+  return Array.from(names).map((name) => ({ name }))
 }
 
 export async function generateMetadata({ params }: PokemonPageProps): Promise<Metadata> {
@@ -77,7 +84,7 @@ function StatBar({ label, value }: { label: string; value: number }) {
   )
 }
 
-async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: string }) {
+async function PokemonDetail({ name }: { name: string }) {
   const month = await getLatestMonth()
   const allMonths = await getAvailableMonths()
   const last6 = allMonths.slice(0, 6).reverse()
@@ -101,12 +108,13 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
   // Only show tiers with meaningful usage; always include at least the top tier
   const tierUsages = allTierUsages.filter((tu, i) => tu.usagePercent >= 0.05 || i === 0)
 
-  // Prefer hintTier (navigated from), else use the first standard tier by priority order.
-  // Do NOT sort by usage: niche formats (e.g. gen9godlygift) can have 100% usage but are
-  // wrong for moveset lookup; tiers[] is already priority-ordered (gen9ou first).
-  const hintMatch = hintTier ? tierSearchResults.find((r) => r?.tier === hintTier) ?? null : null
+  // Use the first standard tier by priority order (tiers[] is already priority-ordered,
+  // gen9ou first). Do NOT sort by usage: niche formats (e.g. gen9godlygift) can have
+  // 100% usage but are wrong for moveset lookup. There's no per-request tier hint here
+  // since this page is fully statically generated — see PokemonRowClient for why the
+  // `?tier=` link param was dropped.
   const priorityMatch = tierSearchResults.find((r) => r !== null)
-  const firstMatch = hintMatch ?? priorityMatch ?? null
+  const firstMatch = priorityMatch ?? null
   const smogonName = firstMatch?.smogonName ?? name
   const mainTier = firstMatch?.tier ?? tiers[0] ?? 'gen9ou'
 
@@ -336,9 +344,8 @@ async function PokemonDetail({ name, hintTier }: { name: string; hintTier?: stri
   )
 }
 
-export default async function PokemonPage({ params, searchParams }: PokemonPageProps) {
+export default async function PokemonPage({ params }: PokemonPageProps) {
   const { name } = await params
-  const { tier: hintTier } = await searchParams
   if (name !== name.toLowerCase()) notFound()
 
   // 404 for names that don't match any known Pokemon
@@ -370,7 +377,7 @@ export default async function PokemonPage({ params, searchParams }: PokemonPageP
             </div>
           }
         >
-          <PokemonDetail name={name.toLowerCase()} hintTier={hintTier} />
+          <PokemonDetail name={name.toLowerCase()} />
         </Suspense>
       </ErrorBoundary>
     </>

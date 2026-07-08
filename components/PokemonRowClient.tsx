@@ -24,17 +24,16 @@ interface RowProps {
   rawCount: number
   rankChange: number | 'NEW' | undefined
   view: 'table' | 'card'
-  sourceTier?: string
   hideChange?: boolean
 }
 
 export const PokemonRowClient = memo(function PokemonRowClient({
-  rank, name, usagePercent, rawCount, rankChange, view, sourceTier, hideChange,
+  rank, name, usagePercent, rawCount, rankChange, view, hideChange,
 }: RowProps): React.JSX.Element {
   const normalized = normalizeSmogonName(name)
   const artworkUrls = getPokemonImageUrls(name)
   const spriteUrls = getPokemonSpriteUrls(name)
-  const pokemonHref = sourceTier ? `/pokemon/${normalized}?tier=${sourceTier}` : `/pokemon/${normalized}`
+  const pokemonHref = `/pokemon/${normalized}`
 
   if (view === 'card') {
     return (
