@@ -36,6 +36,7 @@ const PokemonCard = memo(function PokemonCard({ name, rank, usagePercent, rankCh
   return (
     <Link
       href={`/pokemon/${normalized}`}
+      prefetch={false}
       className="group block rounded-xl bg-[#1a1a24] border border-white/6 p-4 transition-all duration-200 hover:scale-[1.03] hover:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
     >
       <div className="flex items-center justify-between mb-2">
