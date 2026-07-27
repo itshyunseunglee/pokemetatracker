@@ -231,7 +231,7 @@ async function PokemonDetail({ name }: { name: string }) {
               <div className="space-y-3">
                 {tierUsages.map((tu) => (
                   <div key={tu.tier} className="flex items-center gap-3">
-                    <Link href={`/tier/${tu.tier}`} className="w-28 text-xs text-indigo-400 hover:underline truncate focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
+                    <Link href={`/tier/${tu.tier}`} prefetch={false} className="w-28 text-xs text-indigo-400 hover:underline truncate focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded">
                       {tu.tier}
                     </Link>
                     <div className="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
