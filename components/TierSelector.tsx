@@ -7,7 +7,6 @@ interface Props {
   tiers: string[]
   selectedTier: string
   basePath: string
-  paramName?: string
 }
 
 // Tier suffixes (after stripping genX prefix) considered main competitive formats
@@ -22,11 +21,11 @@ function isMainTier(t: string): boolean {
   return MAIN_SUFFIXES.has(suffix) || suffix.startsWith('vgc') || suffix.startsWith('bss') || suffix.startsWith('champions')
 }
 
-function hrefFor(t: string, basePath: string, paramName: string): string {
-  return basePath === '/tier' ? `/tier/${t}` : `${basePath}?${paramName}=${t}`
+function hrefFor(t: string, basePath: string): string {
+  return `${basePath}/${t}`
 }
 
-export default function TierSelector({ tiers, selectedTier, basePath, paramName = 'tier' }: Props): React.JSX.Element {
+export default function TierSelector({ tiers, selectedTier, basePath }: Props): React.JSX.Element {
   const [showAllFormats, setShowAllFormats] = useState(false)
   const [showOlderGens, setShowOlderGens] = useState(false)
   // Tracks when the user explicitly collapses while a niche tier is selected
@@ -89,7 +88,7 @@ export default function TierSelector({ tiers, selectedTier, basePath, paramName 
           {visibleTiers.map((t) => (
             <a
               key={t}
-              href={hrefFor(t, basePath, paramName)}
+              href={hrefFor(t, basePath)}
               className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 whitespace-nowrap ${
                 t === selectedTier
                   ? 'bg-indigo-600 text-white shadow-sm'

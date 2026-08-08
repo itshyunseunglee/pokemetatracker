@@ -14,6 +14,26 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    // /moves, /items, /trends moved from ?tier= query params to /[tier] path
+    // segments so they can be statically generated (generateStaticParams)
+    // instead of forced into per-request dynamic rendering. Preserve old
+    // links/bookmarks/search-indexed URLs with permanent redirects.
+    const bases = ['moves', 'items', 'trends']
+    return bases.flatMap((base) => [
+      {
+        source: `/${base}`,
+        has: [{ type: 'query', key: 'tier', value: '(?<tier>.+)' }],
+        destination: `/${base}/:tier`,
+        permanent: true,
+      },
+      {
+        source: `/${base}`,
+        destination: `/${base}/gen9ou`,
+        permanent: true,
+      },
+    ])
+  },
 }
 
 export default nextConfig

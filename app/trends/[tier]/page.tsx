@@ -1,11 +1,13 @@
 import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import { getLatestMonth, getAvailableTiers, getUsageStats, getAvailableMonths } from '@/lib/smogon'
+import { formatTierName } from '@/constants/tierColors'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import TierSelector from '@/components/TierSelector'
 
-const SearchTrendClient = dynamic(() => import('./SearchTrendClient'), {
+const SearchTrendClient = dynamic(() => import('../SearchTrendClient'), {
   ssr: false,
   loading: () => (
     <div className="space-y-4">
@@ -25,24 +27,42 @@ const SearchTrendClient = dynamic(() => import('./SearchTrendClient'), {
 
 export const revalidate = 86400
 
-export const metadata: Metadata = {
-  title: 'Pokemon Usage Trends — Competitive Meta History | PokeMetaTracker',
-  description: 'Track Pokemon usage trend changes over time in competitive Pokemon Showdown. View 6-month usage history by tier — OU, UU, Ubers, and more. Based on Smogon monthly stats.',
-  alternates: { canonical: 'https://pokemetatracker-psi.vercel.app/trends' },
-  openGraph: {
-    title: 'Pokemon Usage Trends — Competitive Meta History | PokeMetaTracker',
-    description: 'Track Pokemon usage trend changes over time in competitive Pokemon Showdown. View 6-month usage history by tier — OU, UU, Ubers, and more. Based on Smogon monthly stats.',
-    url: 'https://pokemetatracker-psi.vercel.app/trends',
-    images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
-  },
+interface TrendsPageProps {
+  params: Promise<{ tier: string }>
 }
 
-interface TrendsPageProps {
-  searchParams: Promise<{ tier?: string }>
+export async function generateStaticParams() {
+  try {
+    const month = await getLatestMonth()
+    const tiers = await getAvailableTiers(month)
+    return tiers.map((tier) => ({ tier }))
+  } catch {
+    return [
+      { tier: 'gen9ou' }, { tier: 'gen9uu' }, { tier: 'gen9ubers' },
+      { tier: 'gen9ru' }, { tier: 'gen9nu' }, { tier: 'gen9pu' },
+    ]
+  }
+}
+
+export async function generateMetadata({ params }: TrendsPageProps): Promise<Metadata> {
+  const { tier } = await params
+  const displayName = formatTierName(tier)
+  const url = `https://pokemetatracker-psi.vercel.app/trends/${tier}`
+  return {
+    title: `${displayName} Usage Trends — Competitive Meta History | PokeMetaTracker`,
+    description: `Track Pokemon usage trend changes over time in ${displayName} competitive Pokemon Showdown. View 6-month usage history. Based on Smogon monthly stats.`,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${displayName} Usage Trends — Competitive Meta History | PokeMetaTracker`,
+      description: `Track Pokemon usage trend changes over time in ${displayName} competitive Pokemon Showdown. View 6-month usage history. Based on Smogon monthly stats.`,
+      url,
+      images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
+    },
+  }
 }
 
 async function TrendsContent({ tier }: { tier: string }) {
@@ -116,11 +136,13 @@ async function TrendsContent({ tier }: { tier: string }) {
   )
 }
 
-export default async function TrendsPage({ searchParams }: TrendsPageProps) {
-  const params = await searchParams
+export default async function TrendsPage({ params }: TrendsPageProps) {
+  const { tier } = await params
   const latestMonth = await getLatestMonth()
   const tiers = await getAvailableTiers(latestMonth)
-  const tier = params.tier && tiers.includes(params.tier) ? params.tier : tiers[0] ?? 'gen9ou'
+  if (tiers.length > 0 && !tiers.includes(tier)) {
+    notFound()
+  }
 
   return (
     <>

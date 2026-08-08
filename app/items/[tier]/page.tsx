@@ -1,6 +1,8 @@
 import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getLatestMonth, getAvailableTiers, getMovesetText, parseMovesetData, getUsageStats } from '@/lib/smogon'
+import { formatTierName } from '@/constants/tierColors'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import SkeletonTable from '@/components/SkeletonTable'
 import TierSelector from '@/components/TierSelector'
@@ -8,24 +10,8 @@ import ItemImage from '@/components/ItemImage'
 
 export const revalidate = 86400
 
-export const metadata: Metadata = {
-  title: 'Item Usage Rankings — Pokemon Showdown Competitive Stats | PokeMetaTracker',
-  description: 'Most-used held items in competitive Pokemon Showdown by tier. Aggregate item rankings weighted by Pokemon usage in OU, UU, Ubers, and more. Updated monthly from Smogon stats.',
-  alternates: { canonical: 'https://pokemetatracker-psi.vercel.app/items' },
-  openGraph: {
-    title: 'Item Usage Rankings — Pokemon Showdown Competitive Stats | PokeMetaTracker',
-    description: 'Most-used held items in competitive Pokemon Showdown by tier. Aggregate item rankings weighted by Pokemon usage in OU, UU, Ubers, and more. Updated monthly from Smogon stats.',
-    url: 'https://pokemetatracker-psi.vercel.app/items',
-    images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
-  },
-}
-
 interface ItemsPageProps {
-  searchParams: Promise<{ tier?: string }>
+  params: Promise<{ tier: string }>
 }
 
 interface ItemEntry {
@@ -34,6 +20,40 @@ interface ItemEntry {
   count: number
   topPokemon: string
   topPokemonWeight: number
+}
+
+export async function generateStaticParams() {
+  try {
+    const month = await getLatestMonth()
+    const tiers = await getAvailableTiers(month)
+    return tiers.map((tier) => ({ tier }))
+  } catch {
+    return [
+      { tier: 'gen9ou' }, { tier: 'gen9uu' }, { tier: 'gen9ubers' },
+      { tier: 'gen9ru' }, { tier: 'gen9nu' }, { tier: 'gen9pu' },
+    ]
+  }
+}
+
+export async function generateMetadata({ params }: ItemsPageProps): Promise<Metadata> {
+  const { tier } = await params
+  const displayName = formatTierName(tier)
+  const url = `https://pokemetatracker-psi.vercel.app/items/${tier}`
+  return {
+    title: `${displayName} Item Usage Rankings — Pokemon Showdown | PokeMetaTracker`,
+    description: `Most-used held items in ${displayName} competitive Pokemon Showdown. Aggregate item rankings weighted by Pokemon usage. Updated monthly from Smogon stats.`,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${displayName} Item Usage Rankings — Pokemon Showdown | PokeMetaTracker`,
+      description: `Most-used held items in ${displayName} competitive Pokemon Showdown. Aggregate item rankings weighted by Pokemon usage. Updated monthly from Smogon stats.`,
+      url,
+      images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
+    },
+  }
 }
 
 async function ItemsContent({ tier }: { tier: string }) {
@@ -149,11 +169,13 @@ async function ItemsContent({ tier }: { tier: string }) {
   )
 }
 
-export default async function ItemsPage({ searchParams }: ItemsPageProps) {
-  const params = await searchParams
+export default async function ItemsPage({ params }: ItemsPageProps) {
+  const { tier } = await params
   const month = await getLatestMonth()
   const tiers = await getAvailableTiers(month)
-  const tier = params.tier && tiers.includes(params.tier) ? params.tier : tiers[0] ?? 'gen9ou'
+  if (tiers.length > 0 && !tiers.includes(tier)) {
+    notFound()
+  }
 
   return (
     <>

@@ -1,38 +1,58 @@
 import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getLatestMonth, getAvailableTiers, getMovesetText, parseMovesetData, getUsageStats } from '@/lib/smogon'
 import { getMoveType } from '@/constants/moveTypes'
 import { getTypeColor } from '@/constants/typeColors'
+import { formatTierName } from '@/constants/tierColors'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import SkeletonTable from '@/components/SkeletonTable'
 import TierSelector from '@/components/TierSelector'
 
 export const revalidate = 86400
 
-export const metadata: Metadata = {
-  title: 'Move Usage Rankings — Pokemon Showdown Competitive Stats | PokeMetaTracker',
-  description: 'Most-used moves in competitive Pokemon Showdown by tier. Aggregate move rankings across all top Pokemon in OU, UU, Ubers, and more. Updated monthly from Smogon stats.',
-  alternates: { canonical: 'https://pokemetatracker-psi.vercel.app/moves' },
-  openGraph: {
-    title: 'Move Usage Rankings — Pokemon Showdown Competitive Stats | PokeMetaTracker',
-    description: 'Most-used moves in competitive Pokemon Showdown by tier. Aggregate move rankings across all top Pokemon in OU, UU, Ubers, and more. Updated monthly from Smogon stats.',
-    url: 'https://pokemetatracker-psi.vercel.app/moves',
-    images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
-  },
-}
-
 interface MovesPageProps {
-  searchParams: Promise<{ tier?: string }>
+  params: Promise<{ tier: string }>
 }
 
 interface MoveEntry {
   name: string
   totalPercent: number
   count: number
+}
+
+export async function generateStaticParams() {
+  try {
+    const month = await getLatestMonth()
+    const tiers = await getAvailableTiers(month)
+    return tiers.map((tier) => ({ tier }))
+  } catch {
+    return [
+      { tier: 'gen9ou' }, { tier: 'gen9uu' }, { tier: 'gen9ubers' },
+      { tier: 'gen9ru' }, { tier: 'gen9nu' }, { tier: 'gen9pu' },
+    ]
+  }
+}
+
+export async function generateMetadata({ params }: MovesPageProps): Promise<Metadata> {
+  const { tier } = await params
+  const displayName = formatTierName(tier)
+  const url = `https://pokemetatracker-psi.vercel.app/moves/${tier}`
+  return {
+    title: `${displayName} Move Usage Rankings — Pokemon Showdown | PokeMetaTracker`,
+    description: `Most-used moves in ${displayName} competitive Pokemon Showdown. Aggregate move rankings weighted by Pokemon usage. Updated monthly from Smogon stats.`,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${displayName} Move Usage Rankings — Pokemon Showdown | PokeMetaTracker`,
+      description: `Most-used moves in ${displayName} competitive Pokemon Showdown. Aggregate move rankings weighted by Pokemon usage. Updated monthly from Smogon stats.`,
+      url,
+      images: [{ url: 'https://pokemetatracker-psi.vercel.app/opengraph-image', width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      images: ['https://pokemetatracker-psi.vercel.app/opengraph-image'],
+    },
+  }
 }
 
 function MoveBadge({ moveName }: { moveName: string }): React.JSX.Element {
@@ -157,11 +177,13 @@ async function MovesContent({ tier }: { tier: string }) {
   )
 }
 
-export default async function MovesPage({ searchParams }: MovesPageProps) {
-  const params = await searchParams
+export default async function MovesPage({ params }: MovesPageProps) {
+  const { tier } = await params
   const month = await getLatestMonth()
   const tiers = await getAvailableTiers(month)
-  const tier = params.tier && tiers.includes(params.tier) ? params.tier : tiers[0] ?? 'gen9ou'
+  if (tiers.length > 0 && !tiers.includes(tier)) {
+    notFound()
+  }
 
   return (
     <>
