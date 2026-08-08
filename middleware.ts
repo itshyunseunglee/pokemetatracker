@@ -1,7 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Only /api/trends does real per-request work (it fetches + aggregates Smogon
+// data for arbitrary name/tier/month combos). Every other route here is fully
+// static (SSG or ISR with revalidate=86400), so CDN caching already makes repeat
+// GETs free — rate-limiting them too was blocking Googlebot's crawl of the sitemap
+// with 429s and tanking indexing (GSC: 467 "not indexed" vs 35 indexed).
 export const config = {
-  matcher: ['/pokemon/:path*', '/tier/:path*', '/moves', '/items', '/trends', '/api/trends'],
+  matcher: ['/api/trends'],
 }
 
 const WINDOW_MS = 60_000
